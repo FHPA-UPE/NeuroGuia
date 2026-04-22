@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-atkinson), sans-serif;
+  background-color: #F5F0E8;
+  color: #1a1a1a;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ollie-avatar svg {
+    animation: none !important;
+  }
+}
+
+/* OLLIE Avatar Animations */
+@keyframes ollie-bob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes ollie-talk {
+  0%, 100% { transform: scaleY(1); transform-origin: top center; }
+  50%       { transform: scaleY(1.6); transform-origin: top center; }
+}
+
+@keyframes ollie-think {
+  0%, 100% { transform: rotate(0deg); transform-origin: bottom center; }
+  40%       { transform: rotate(-10deg); transform-origin: bottom center; }
+  60%       { transform: rotate(10deg); transform-origin: bottom center; }
+}
+
+.ollie-idle     { animation: ollie-bob   3s ease-in-out infinite; }
+.ollie-talking  { animation: ollie-bob   3s ease-in-out infinite; }
+.ollie-thinking { animation: ollie-think 2s ease-in-out infinite; }
+
+.ollie-beak-bottom {
+  transform-box: fill-box;
+}
+
+.ollie-talking .ollie-beak-bottom {
+  animation: ollie-talk 0.35s ease-in-out infinite;
+}
