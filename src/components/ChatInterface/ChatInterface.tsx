@@ -3,10 +3,11 @@ import OllieAvatar from '@/components/OllieAvatar/OllieAvatar'
 import ChatBubble from '@/components/ChatBubble/ChatBubble'
 import QuickReply from '@/components/QuickReply/QuickReply'
 import ChatInput from '@/components/ChatInput/ChatInput'
+import EmotionControls from '@/components/EmotionControls/EmotionControls'
 import { useChat } from '@/hooks/useChat'
 
 export default function ChatInterface() {
-  const { messages, isLoading, avatarState, movement, sendMessage } = useChat()
+  const { messages, isLoading, avatarState, movement, sendMessage, setAvatarState, setMovement } = useChat()
 
   const lastMessage = messages.filter((m) => m.role === 'assistant').at(-1)
   const quickReplies = lastMessage?.quick_replies ?? []
@@ -19,9 +20,16 @@ export default function ChatInterface() {
         </span>
       </header>
 
-      <div className="flex justify-center p-4">
+      <div className="flex justify-center pt-4 px-4">
         <OllieAvatar avatarState={avatarState} movement={movement} />
       </div>
+
+      <EmotionControls
+        avatarState={avatarState}
+        movement={movement}
+        onStateChange={setAvatarState}
+        onMovementChange={setMovement}
+      />
 
       <div
         className="flex-1 overflow-y-auto px-4 py-2 flex flex-col gap-3"

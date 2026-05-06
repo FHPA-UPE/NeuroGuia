@@ -60,5 +60,5 @@ export function useChat() {
     setMovement('idle')
   }, [messages])
 
-  return { messages, isLoading, avatarState, movement, sendMessage }
+  return { messages, isLoading, avatarState, movement, sendMessage, setAvatarState, setMovement }
 }
