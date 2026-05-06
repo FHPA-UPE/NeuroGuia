@@ -7,11 +7,31 @@
 }
 
 body {
-  font-family: var(--font-atkinson), sans-serif;
+  font-family: var(--font-atkinson), 'Atkinson Hyperlegible', sans-serif;
   background-color: #F5F0E8;
   color: #1a1a1a;
   line-height: 1.6;
   letter-spacing: 0.02em;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(45, 80, 22, 0.2);
+  border-radius: 2px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

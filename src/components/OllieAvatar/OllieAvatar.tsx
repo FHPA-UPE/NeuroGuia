@@ -78,8 +78,8 @@ const EXPRESSIONS: Record<AvatarState, ExpressionConfig> = {
 }
 
 export default function OllieAvatar({ avatarState, movement }: OllieAvatarProps) {
-  const expr        = EXPRESSIONS[avatarState]
-  const eyeRy       = EYE_RY[expr.eyeShape]
+  const expr         = EXPRESSIONS[avatarState]
+  const eyeRy        = EYE_RY[expr.eyeShape]
   const leftPupilCy  = expr.leftPupil.cy  + expr.eyeLidOffset
   const rightPupilCy = expr.rightPupil.cy + expr.eyeLidOffset
 
@@ -97,7 +97,6 @@ export default function OllieAvatar({ avatarState, movement }: OllieAvatarProps)
         aria-hidden="true"
       >
         <defs>
-          {/* Clipping das pupilas */}
           <clipPath id="ollieLeftEyeClip">
             <ellipse cx="78" cy="80" rx="22" ry={eyeRy} />
           </clipPath>
@@ -105,121 +104,120 @@ export default function OllieAvatar({ avatarState, movement }: OllieAvatarProps)
             <ellipse cx="122" cy="80" rx="22" ry={eyeRy} />
           </clipPath>
 
-          {/* Gradiente 3D da cabeça */}
-          <radialGradient id="ollieHeadGrad" cx="42%" cy="35%" r="58%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#F0A020" />
-            <stop offset="55%"  stopColor="#C8760A" />
-            <stop offset="100%" stopColor="#8A4A00" />
+          <radialGradient id="ollieHeadGrad" cx="38%" cy="30%" r="55%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#FFB830" />
+            <stop offset="60%"  stopColor="#D4820C" />
+            <stop offset="100%" stopColor="#A05000" />
           </radialGradient>
 
-          {/* Gradiente 3D do corpo */}
-          <radialGradient id="ollieBodyGrad" cx="45%" cy="28%" r="65%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#E89C18" />
-            <stop offset="50%"  stopColor="#C8760A" />
-            <stop offset="100%" stopColor="#8A4A00" />
+          <radialGradient id="ollieBodyGrad" cx="40%" cy="25%" r="60%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#F0A820" />
+            <stop offset="55%"  stopColor="#D4820C" />
+            <stop offset="100%" stopColor="#A05000" />
           </radialGradient>
 
-          {/* Gradiente da barriga */}
           <radialGradient id="ollieBellyGrad" cx="50%" cy="38%" r="60%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#FFFFFF" />
-            <stop offset="85%"  stopColor="#F0EAE0" />
-            <stop offset="100%" stopColor="#E0D8CC" />
+            <stop offset="0%"   stopColor="#FFFBF5" />
+            <stop offset="85%"  stopColor="#F2EAE0" />
+            <stop offset="100%" stopColor="#E0D4C4" />
           </radialGradient>
 
-          {/* Gradiente das asas */}
-          <radialGradient id="ollieWingGrad" cx="50%" cy="30%" r="70%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#B87808" />
-            <stop offset="100%" stopColor="#6A3800" />
+          <radialGradient id="ollieWingGrad" cx="45%" cy="25%" r="65%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#C88010" />
+            <stop offset="100%" stopColor="#7A4000" />
           </radialGradient>
 
-          {/* Disco facial */}
-          <radialGradient id="ollieFaceDiscGrad" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#F0D490" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#F0D490" stopOpacity="0" />
-          </radialGradient>
+          <filter id="ollie-drop-shadow" x="-20%" y="-15%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#2D1200" floodOpacity="0.22" />
+          </filter>
         </defs>
 
-        {/* Sombra no chão */}
-        <ellipse cx="100" cy="219" rx="52" ry="5" fill="#5A2A00" opacity="0.22" />
+        <g filter="url(#ollie-drop-shadow)">
 
-        {/* Asas */}
-        <ellipse cx="42"  cy="148" rx="22" ry="46" fill="url(#ollieWingGrad)" transform="rotate(-10 42 148)" />
-        <ellipse cx="158" cy="148" rx="22" ry="46" fill="url(#ollieWingGrad)" transform="rotate(10 158 148)" />
+          {/* Sombra no chão */}
+          <ellipse cx="100" cy="219" rx="50" ry="5" fill="#4A2200" opacity="0.28" />
 
-        {/* Corpo com gradiente 3D */}
-        <ellipse cx="100" cy="150" rx="62" ry="68" fill="url(#ollieBodyGrad)" />
+          {/* Asas */}
+          <ellipse cx="42"  cy="148" rx="22" ry="46" fill="url(#ollieWingGrad)" stroke="#2D1200" strokeWidth="2.5" transform="rotate(-10 42 148)" />
+          <ellipse cx="158" cy="148" rx="22" ry="46" fill="url(#ollieWingGrad)" stroke="#2D1200" strokeWidth="2.5" transform="rotate(10 158 148)" />
 
-        {/* Barriga */}
-        <ellipse cx="100" cy="160" rx="38" ry="48" fill="url(#ollieBellyGrad)" />
+          {/* Corpo */}
+          <ellipse cx="100" cy="150" rx="62" ry="68" fill="url(#ollieBodyGrad)" stroke="#2D1200" strokeWidth="3" />
 
-        {/* Marcas de penas */}
-        <path d="M 88 152 Q 94 159 100 152" stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
-        <path d="M 100 152 Q 106 159 112 152" stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
-        <path d="M 83 164 Q 91 171 99 164"  stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
-        <path d="M 101 164 Q 109 171 117 164" stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
-        <path d="M 88 177 Q 96 184 104 177"  stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
+          {/* Barriga */}
+          <ellipse cx="100" cy="160" rx="38" ry="48" fill="url(#ollieBellyGrad)" stroke="#2D1200" strokeWidth="2" />
 
-        {/* Grupo da cabeça */}
-        <g data-testid="ollie-head-group" transform={`rotate(${expr.headTilt}, 100, 78)`}>
-          {/* Cabeça com gradiente 3D */}
-          <circle cx="100" cy="78" r="52" fill="url(#ollieHeadGrad)" />
+          {/* Marcas de penas */}
+          <path d="M 88 152 Q 94 159 100 152" stroke="#A86020" strokeWidth="2" fill="none" strokeLinecap="round" />
+          <path d="M 100 152 Q 106 159 112 152" stroke="#A86020" strokeWidth="2" fill="none" strokeLinecap="round" />
+          <path d="M 83 164 Q 91 171 99 164"   stroke="#A86020" strokeWidth="2" fill="none" strokeLinecap="round" />
+          <path d="M 101 164 Q 109 171 117 164" stroke="#A86020" strokeWidth="2" fill="none" strokeLinecap="round" />
+          <path d="M 88 177 Q 96 184 104 177"   stroke="#A86020" strokeWidth="2" fill="none" strokeLinecap="round" />
 
-          {/* Disco facial */}
-          <ellipse cx="100" cy="82" rx="46" ry="44" fill="url(#ollieFaceDiscGrad)" />
+          {/* Grupo da cabeça */}
+          <g data-testid="ollie-head-group" transform={`rotate(${expr.headTilt}, 100, 78)`}>
 
-          {/* Tufos das orelhas */}
-          <polygon points="72,32 60,10 84,28" fill="url(#ollieHeadGrad)" />
-          <polygon points="128,32 140,10 116,28" fill="url(#ollieHeadGrad)" />
+            {/* Cabeça */}
+            <circle cx="100" cy="78" r="52" fill="url(#ollieHeadGrad)" stroke="#2D1200" strokeWidth="3" />
 
-          {/* Chapéu — aba LARGA (mortarboard) */}
-          <rect x="18" y="34" width="164" height="12" rx="5" fill="#4A2800" />
-          {/* Chapéu — faixa branca entre aba e topo */}
-          <rect x="48" y="27" width="104" height="10" rx="3" fill="#F5F0E8" />
-          {/* Chapéu — topo chocolate escuro */}
-          <rect x="56" y="1" width="88" height="28" rx="5" fill="#3D2000" />
-          {/* Chapéu — borla */}
-          <line x1="142" y1="10" x2="170" y2="28" stroke="#C8860A" strokeWidth="2.5" />
-          <circle cx="172" cy="30" r="7" fill="#C8860A" />
+            {/* Tufos das orelhas */}
+            <polygon points="72,32 60,10 84,28" fill="url(#ollieHeadGrad)" stroke="#2D1200" strokeWidth="2.5" strokeLinejoin="round" />
+            <polygon points="128,32 140,10 116,28" fill="url(#ollieHeadGrad)" stroke="#2D1200" strokeWidth="2.5" strokeLinejoin="round" />
 
-          {/* Olhos brancos */}
-          <ellipse data-testid="ollie-left-eye"  cx="78"  cy="80" rx="22" ry={eyeRy} fill="white" />
-          <ellipse data-testid="ollie-right-eye" cx="122" cy="80" rx="22" ry={eyeRy} fill="white" />
+            {/* Chapéu — aba */}
+            <rect x="18" y="34" width="164" height="12" rx="5" fill="#4A2800" stroke="#2D1200" strokeWidth="2" />
+            {/* Chapéu — faixa branca */}
+            <rect x="48" y="27" width="104" height="10" rx="3" fill="#F5F0E8" stroke="#2D1200" strokeWidth="1.5" />
+            {/* Chapéu — topo */}
+            <rect x="56" y="1" width="88" height="28" rx="5" fill="#3D2000" stroke="#2D1200" strokeWidth="2" />
+            {/* Chapéu — borla */}
+            <line x1="142" y1="10" x2="170" y2="28" stroke="#C8860A" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="172" cy="30" r="8" fill="#C8860A" stroke="#2D1200" strokeWidth="2" />
 
-          {/* Pupilas */}
-          <g clipPath="url(#ollieLeftEyeClip)">
-            <circle cx={expr.leftPupil.cx}      cy={leftPupilCy}      r="13"  fill="#1a1a1a" />
-            <circle cx={expr.leftPupil.cx + 5}  cy={leftPupilCy  - 5} r="4.5" fill="white" />
+            {/* Olhos brancos */}
+            <ellipse data-testid="ollie-left-eye"  cx="78"  cy="80" rx="22" ry={eyeRy} fill="white" stroke="#2D1200" strokeWidth="2.5" />
+            <ellipse data-testid="ollie-right-eye" cx="122" cy="80" rx="22" ry={eyeRy} fill="white" stroke="#2D1200" strokeWidth="2.5" />
+
+            {/* Pupilas */}
+            <g clipPath="url(#ollieLeftEyeClip)">
+              <circle cx={expr.leftPupil.cx}      cy={leftPupilCy}      r="13"  fill="#1a1a1a" />
+              <circle cx={expr.leftPupil.cx + 5}  cy={leftPupilCy  - 5} r="4.5" fill="white" />
+            </g>
+            <g clipPath="url(#ollieRightEyeClip)">
+              <circle cx={expr.rightPupil.cx}     cy={rightPupilCy}     r="13"  fill="#1a1a1a" />
+              <circle cx={expr.rightPupil.cx + 5} cy={rightPupilCy - 5} r="4.5" fill="white" />
+            </g>
+
+            {/* Sobrancelhas */}
+            <path d={expr.leftBrow}  stroke="#3D2000" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+            <path d={expr.rightBrow} stroke="#3D2000" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+
+            {/* Interior da boca */}
+            <ellipse cx="100" cy="114" rx="16" ry="9" fill="#CC3300" />
+            {/* Bico superior */}
+            <polygon points="100,88 82,112 118,112" fill="#F0C820" stroke="#2D1200" strokeWidth="2" strokeLinejoin="round" />
+            {/* Bico inferior */}
+            <path
+              data-testid="ollie-beak-lower"
+              className="ollie-beak-bottom"
+              d={expr.beakPath}
+              fill="#D4900C"
+              stroke="#2D1200"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
           </g>
-          <g clipPath="url(#ollieRightEyeClip)">
-            <circle cx={expr.rightPupil.cx}     cy={rightPupilCy}     r="13"  fill="#1a1a1a" />
-            <circle cx={expr.rightPupil.cx + 5} cy={rightPupilCy - 5} r="4.5" fill="white" />
-          </g>
 
-          {/* Sobrancelhas — marrom escuro, espessas */}
-          <path d={expr.leftBrow}  stroke="#5C3200" strokeWidth="4" strokeLinecap="round" fill="none" />
-          <path d={expr.rightBrow} stroke="#5C3200" strokeWidth="4" strokeLinecap="round" fill="none" />
+          {/* Pé esquerdo */}
+          <ellipse cx="75"  cy="214" rx="7" ry="4" fill="#F0C820" stroke="#2D1200" strokeWidth="1.5" />
+          <ellipse cx="86"  cy="215" rx="9" ry="5" fill="#F0C820" stroke="#2D1200" strokeWidth="1.5" />
+          <ellipse cx="97"  cy="214" rx="7" ry="4" fill="#F0C820" stroke="#2D1200" strokeWidth="1.5" />
+          {/* Pé direito */}
+          <ellipse cx="103" cy="214" rx="7" ry="4" fill="#F0C820" stroke="#2D1200" strokeWidth="1.5" />
+          <ellipse cx="114" cy="215" rx="9" ry="5" fill="#F0C820" stroke="#2D1200" strokeWidth="1.5" />
+          <ellipse cx="125" cy="214" rx="7" ry="4" fill="#F0C820" stroke="#2D1200" strokeWidth="1.5" />
 
-          {/* Interior da boca — visível quando bico abre (happy/encouraging) */}
-          <ellipse cx="100" cy="114" rx="16" ry="9" fill="#CC3300" />
-          {/* Bico superior — mais largo e proeminente */}
-          <polygon points="100,88 82,112 118,112" fill="#E8B923" />
-          {/* Bico inferior — expressivo */}
-          <path
-            data-testid="ollie-beak-lower"
-            className="ollie-beak-bottom"
-            d={expr.beakPath}
-            fill="#C8860A"
-          />
         </g>
-
-        {/* Pé esquerdo — 3 dedos em leque */}
-        <ellipse cx="75"  cy="214" rx="7" ry="4" fill="#E8B923" />
-        <ellipse cx="86"  cy="215" rx="9" ry="5" fill="#E8B923" />
-        <ellipse cx="97"  cy="214" rx="7" ry="4" fill="#E8B923" />
-        {/* Pé direito — 3 dedos em leque */}
-        <ellipse cx="103" cy="214" rx="7" ry="4" fill="#E8B923" />
-        <ellipse cx="114" cy="215" rx="9" ry="5" fill="#E8B923" />
-        <ellipse cx="125" cy="214" rx="7" ry="4" fill="#E8B923" />
       </svg>
     </div>
   )

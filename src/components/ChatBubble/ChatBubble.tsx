@@ -9,10 +9,10 @@ export default function ChatBubble({ role, content }: ChatBubbleProps) {
     <div
       role="log"
       aria-live="polite"
-      className={`max-w-[80%] rounded-2xl px-4 py-3 text-lg leading-relaxed font-[Atkinson_Hyperlegible] ${
+      className={`max-w-[82%] rounded-2xl px-4 py-3 text-base leading-relaxed shadow-sm ${
         isAssistant
-          ? 'bg-[#2D5016] text-white self-start'
-          : 'bg-[#C8860A] text-white self-end'
+          ? 'bg-[#2D5016] text-white self-start rounded-tl-sm'
+          : 'bg-[#C8860A] text-white self-end rounded-tr-sm'
       }`}
     >
       {content}
