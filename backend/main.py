@@ -6,6 +6,7 @@ from routers import auth as auth_router
 from routers import chat as chat_router
 from routers import config as config_router
 from routers import docs as docs_router
+from routers import feedback as feedback_router
 
 load_dotenv()
 
@@ -29,6 +30,7 @@ app.include_router(auth_router.router)
 app.include_router(chat_router.router)
 app.include_router(config_router.router)
 app.include_router(docs_router.router)
+app.include_router(feedback_router.router)
 
 
 @app.get("/health")
