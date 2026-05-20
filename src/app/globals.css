@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+:root {
+  --color-ice-white: #F4F6FB;
+  --color-pure-white: #FFFFFF;
+  --color-frost: #EEF1F8;
+  --color-mist: #DDE2EE;
+  --color-calm-indigo: #4A5BE0;
+  --color-deep-indigo: #3A4BC8;
+  --color-soft-indigo: #EEF0FC;
+  --color-warm-terracotta: #D95F3B;
+  --color-deep-terracotta: #C04E2C;
+  --color-blush: #FBF0EC;
+  --color-midnight: #1C1E2E;
+  --color-slate: #5A5F7A;
+  --color-silver: #6D7A99;
+  --color-forest-green: #1A7F5A;
+  --color-amber: #D4880A;
+  --color-crimson: #C0392B;
+  --color-ocean-blue: #2E6DB4;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -8,10 +28,16 @@
 
 body {
   font-family: var(--font-atkinson), 'Atkinson Hyperlegible', sans-serif;
-  background-color: #F5F0E8;
-  color: #1a1a1a;
-  line-height: 1.6;
-  letter-spacing: 0.02em;
+  background-color: var(--color-ice-white);
+  color: var(--color-midnight);
+  font-size: 16px;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+
+*:focus-visible {
+  outline: 3px solid var(--color-calm-indigo);
+  outline-offset: 3px;
 }
 
 /* Scrollbar */
