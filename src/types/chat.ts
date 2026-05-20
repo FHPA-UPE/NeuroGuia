@@ -8,6 +8,7 @@ export interface ChatMessage {
   avatar_state?: AvatarState
   movement?: Movement
   quick_replies?: string[]
+  sources?: string[]
 }
 
 export interface ChatResponse {
@@ -15,4 +16,5 @@ export interface ChatResponse {
   avatar_state: AvatarState
   movement: Movement
   quick_replies?: string[]
+  sources?: string[]
 }
