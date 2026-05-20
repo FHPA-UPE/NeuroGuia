@@ -3,8 +3,8 @@ import { useState } from 'react'
 import OllieAvatar from '@/components/OllieAvatar/OllieAvatar'
 import { ChatBubble } from '@/components/ChatBubble'
 import QuickReply from '@/components/QuickReply/QuickReply'
-import ChatInput from '@/components/ChatInput/ChatInput'
-import EmotionControls from '@/components/EmotionControls/EmotionControls'
+import { ChatInput } from '@/components/ChatInput'
+import { EmotionControls } from '@/components/EmotionControls/EmotionControls'
 import { useChat } from '@/hooks/useChat'
 
 function IconAudioOn() {
@@ -30,6 +30,9 @@ function IconAudioOff() {
 export default function ChatInterface() {
   const { messages, isLoading, avatarState, movement, sendMessage, setAvatarState, setMovement } = useChat()
   const [audioEnabled, setAudioEnabled] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const speechSupported = typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)
 
   const lastMessage = messages.filter((m) => m.role === 'assistant').at(-1)
   const quickReplies = lastMessage?.quick_replies ?? []
@@ -56,6 +59,7 @@ export default function ChatInterface() {
         </div>
         <div className="w-full">
           <EmotionControls
+            visible={true}
             avatarState={avatarState}
             movement={movement}
             onStateChange={setAvatarState}
@@ -68,7 +72,15 @@ export default function ChatInterface() {
               <QuickReply options={quickReplies} onSelect={sendMessage} />
             </div>
           )}
-          <ChatInput onSubmit={sendMessage} disabled={isLoading} />
+          <ChatInput
+            onSend={sendMessage}
+            disabled={isLoading}
+            isListening={isListening}
+            isSpeaking={isSpeaking}
+            speechSupported={speechSupported}
+            onToggleListen={() => setIsListening(!isListening)}
+            onToggleSpeak={() => setIsSpeaking(!isSpeaking)}
+          />
         </div>
       </div>
 

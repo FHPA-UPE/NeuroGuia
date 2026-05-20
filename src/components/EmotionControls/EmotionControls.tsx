@@ -1,6 +1,7 @@
 import type { AvatarState, Movement } from '@/types/chat'
 
 interface EmotionControlsProps {
+  visible: boolean
   avatarState: AvatarState
   movement: Movement
   onStateChange: (state: AvatarState) => void
@@ -21,7 +22,8 @@ const MOVEMENTS: { value: Movement; label: string }[] = [
   { value: 'thinking', label: 'Pensando' },
 ]
 
-export default function EmotionControls({ avatarState, movement, onStateChange, onMovementChange }: EmotionControlsProps) {
+export function EmotionControls({ visible, avatarState, movement, onStateChange, onMovementChange }: EmotionControlsProps) {
+  if (!visible) return null
   return (
     <div className="flex-shrink-0 border-y border-[#2D5016]/10 px-4 py-2 flex flex-col gap-1.5">
       <div className="flex items-center gap-2">
