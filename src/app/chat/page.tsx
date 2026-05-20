@@ -11,6 +11,7 @@ import { ChatInput } from '@/components/ChatInput'
 import { EmotionControls } from '@/components/EmotionControls'
 import { LgpdModal } from '@/components/LgpdModal'
 import QuickReply from '@/components/QuickReply/QuickReply'
+import { SessionRatingToast } from '@/components/SessionRatingToast'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -23,6 +24,7 @@ export default function ChatPage() {
   const [audioEnabled, setAudioEnabled] = useState(false)
   const [showLgpdModal, setShowLgpdModal] = useState(false)
   const [lgpdAccepted, setLgpdAccepted] = useState(false)
+  const [showRating, setShowRating] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -38,6 +40,17 @@ export default function ChatPage() {
       })
     }
   }, [messages, audioEnabled, speak])
+
+  useEffect(() => {
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      if (messages.length > 0) {
+        setShowRating(true)
+        e.preventDefault()
+      }
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [messages.length])
 
   function handleToggleListen() {
     if (!lgpdAccepted) { setShowLgpdModal(true); return }
@@ -70,7 +83,21 @@ export default function ChatPage() {
     }).catch(() => {})
   }
 
+  function submitSessionRating(emoji: 'happy' | 'neutral' | 'sad') {
+    const tok = sessionStorage.getItem('access_token') ?? ''
+    fetch(`${API}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },
+      body: JSON.stringify({ type: 'session', emoji, message_count: messages.length }),
+    }).catch(() => {})
+    setShowRating(false)
+  }
+
   function handleLogout() {
+    if (messages.length > 0) {
+      setShowRating(true)
+      return
+    }
     document.cookie = 'access_token=; path=/; max-age=0'
     logout()
     router.push('/login')
@@ -149,6 +176,13 @@ export default function ChatPage() {
         <LgpdModal
           onAccept={() => { setLgpdAccepted(true); setShowLgpdModal(false); startListening() }}
           onDecline={() => setShowLgpdModal(false)}
+        />
+      )}
+
+      {showRating && (
+        <SessionRatingToast
+          onRate={emoji => { submitSessionRating(emoji); document.cookie = 'access_token=; path=/; max-age=0'; logout(); router.push('/login') }}
+          onDismiss={() => { setShowRating(false); document.cookie = 'access_token=; path=/; max-age=0'; logout(); router.push('/login') }}
         />
       )}
     </>
