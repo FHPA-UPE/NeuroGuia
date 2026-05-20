@@ -1,0 +1,7 @@
+{
+  "system_prompt": "Você é OWL.",
+  "llm_provider": "anthropic",
+  "llm_model": "claude-haiku-4-5-20251001",
+  "embed_provider": "openai",
+  "embed_model": "text-embedding-3-small"
+}
