@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cd \"C:\\\\Projetos\\\\NeuroGuia\"; Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd \"C:\\\\Projetos\\\\NeuroGuia\"; npm run dev')",
+      "PowerShell(Start-Sleep -Seconds 4; Start-Process \"http://localhost:3000\")",
+      "PowerShell(Get-Command *)"
+    ]
+  }
+}
