@@ -1,0 +1,107 @@
+import asyncio
+import json
+import re
+from typing import AsyncGenerator, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel
+from sse_starlette.sse import EventSourceResponse
+
+import auth as auth_module
+from persona import build_messages
+from providers import call_llm_stream, get_embeddings
+from services import config_service
+from services import rag_service
+
+router = APIRouter(tags=["chat"])
+# auto_error=False so we control the response code (403 instead of 401)
+security = HTTPBearer(auto_error=False)
+
+COLD_START_MSG = {
+    "message": "Ainda não tenho documentos para consultar. Um administrador precisa adicionar a base de conhecimento primeiro.",
+    "avatar_state": "empathetic",
+    "movement": "talking",
+    "quick_replies": [],
+    "sources": [],
+}
+
+
+def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)) -> dict:
+    if not credentials:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token inválido")
+    try:
+        return auth_module.verify_token(credentials.credentials)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token inválido")
+
+
+class ChatRequest(BaseModel):
+    message: str
+    history: list[dict] = []
+
+
+async def _stream(request: ChatRequest) -> AsyncGenerator:
+    cfg = config_service.read_config()
+    system_prompt = cfg["system_prompt"]
+
+    if rag_service._get_collection_count() == 0:
+        yield {"data": json.dumps(COLD_START_MSG)}
+        yield {"event": "done", "data": "{}"}
+        return
+
+    embeddings = get_embeddings()
+    docs = rag_service.retrieve(request.message, embeddings)
+    sources = rag_service.extract_sources(docs)
+    context = "\n\n".join(d.page_content for d in docs)
+
+    messages = build_messages(system_prompt, request.history, request.message, context)
+
+    heartbeat_task = asyncio.create_task(_heartbeat())
+    buffer = ""
+    try:
+        async for token in call_llm_stream(messages):
+            buffer += token
+
+        parsed = _parse_json_response(buffer)
+        llm_sources = parsed.get("sources", [])
+        if llm_sources not in (["Conhecimento / treinamento do modelo"], ["Sem identificação da fonte"]):
+            parsed["sources"] = sources
+
+        yield {"data": json.dumps(parsed, ensure_ascii=False)}
+    except Exception as e:
+        yield {"data": json.dumps({
+            "message": "Ops, demorei demais para responder. Tente novamente.",
+            "avatar_state": "empathetic", "movement": "talking",
+            "quick_replies": [], "sources": [],
+        })}
+    finally:
+        heartbeat_task.cancel()
+        yield {"event": "done", "data": "{}"}
+
+
+async def _heartbeat():
+    while True:
+        await asyncio.sleep(15)
+
+
+def _parse_json_response(text: str) -> dict:
+    text = text.strip()
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group())
+        except json.JSONDecodeError:
+            pass
+    return {
+        "message": text[:500] if text else "Não consegui processar a resposta.",
+        "avatar_state": "neutral",
+        "movement": "talking",
+        "quick_replies": [],
+        "sources": [],
+    }
+
+
+@router.post("/chat")
+async def chat(request: ChatRequest, user: dict = Depends(get_current_user)):
+    return EventSourceResponse(_stream(request))
