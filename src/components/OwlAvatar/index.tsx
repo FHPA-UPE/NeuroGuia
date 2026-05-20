@@ -49,7 +49,7 @@ export function OwlAvatar({ state, movement, beakOpen }: OwlAvatarProps) {
 
   return (
     <div
-      className={motionClass}
+      className={`${motionClass} owl-state-${state}`}
       style={{ transform: `rotate(${expr.headTilt}deg)`, transition: 'transform 0.4s ease' }}
     >
       <svg

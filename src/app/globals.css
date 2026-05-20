@@ -102,3 +102,54 @@ body {
 .ollie-talking .ollie-beak-bottom {
   animation: ollie-talk 0.35s ease-in-out infinite;
 }
+
+/* OWL animations */
+@keyframes owl-idle-bob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes owl-talk-bob {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  25% { transform: translateY(-2px) scale(1.01); }
+  75% { transform: translateY(2px) scale(0.99); }
+}
+@keyframes owl-think-spin {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+@keyframes owl-talk-beak {
+  0%, 100% { d: path('M33,47 Q40,50 47,47'); }
+  50% { d: path('M33,47 Q40,56 47,47'); }
+}
+@keyframes owl-hat-happy-bounce {
+  0% { transform: translateY(0) rotate(0deg); }
+  30% { transform: translateY(-6px) rotate(-3deg); }
+  60% { transform: translateY(2px) rotate(2deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+@keyframes owl-tassel-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(20deg); }
+}
+@keyframes owl-tassel-pendulum {
+  0%, 100% { transform: rotate(-25deg); }
+  50% { transform: rotate(25deg); }
+}
+
+.owl-idle { animation: owl-idle-bob 3s ease-in-out infinite; }
+.owl-talking { animation: owl-talk-bob 0.4s ease-in-out infinite; }
+.owl-thinking { animation: owl-think-spin 3s ease-in-out infinite; }
+
+.owl-talk { animation: owl-talk-beak 0.24s ease-in-out; }
+
+/* Hat animations per avatar_state */
+.owl-state-happy #owl-hat { animation: owl-hat-happy-bounce 0.5s ease-out forwards; }
+.owl-state-happy #owl-hat-tassel { animation: owl-tassel-sway 0.6s ease-in-out 0.1s; }
+.owl-state-thoughtful #owl-hat-tassel { animation: owl-tassel-pendulum 1.5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .owl-idle, .owl-talking, .owl-thinking, .owl-talk,
+  .owl-state-happy #owl-hat, .owl-state-happy #owl-hat-tassel,
+  .owl-state-thoughtful #owl-hat-tassel { animation: none; }
+}
