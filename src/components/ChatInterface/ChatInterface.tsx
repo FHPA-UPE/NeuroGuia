@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import OllieAvatar from '@/components/OllieAvatar/OllieAvatar'
-import ChatBubble from '@/components/ChatBubble/ChatBubble'
+import { ChatBubble } from '@/components/ChatBubble'
 import QuickReply from '@/components/QuickReply/QuickReply'
 import ChatInput from '@/components/ChatInput/ChatInput'
 import EmotionControls from '@/components/EmotionControls/EmotionControls'
@@ -80,7 +80,7 @@ export default function ChatInterface() {
           aria-label="Conversa com OLLIE"
         >
           {messages.map((msg) => (
-            <ChatBubble key={msg.id} role={msg.role} content={msg.content} />
+            <ChatBubble key={msg.id} message={msg} onFeedback={() => {}} />
           ))}
           {isLoading && (
             <div className="self-start flex items-center gap-1 px-3 py-2.5 bg-[#2D5016]/8 rounded-2xl rounded-tl-sm">
