@@ -1,4 +1,4 @@
-import type { ChatMessage, ChatResponse, AvatarState, Movement } from '../chat'
+import type { ChatMessage, AvatarState } from '../chat'
 import type { Role, AuthUser } from '../auth'
 
 test('AvatarState cobre os 5 estados', () => {
