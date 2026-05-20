@@ -23,8 +23,8 @@ def mask_key(key: str) -> str:
 
 async def call_llm_stream(messages: list[dict]):
     cfg = read_config()
-    provider = cfg["llm_provider"]
-    model = cfg["llm_model"]
+    provider = cfg.get("llm_provider", "anthropic")
+    model = cfg.get("llm_model", "claude-haiku-4-5-20251001")
     litellm_model = f"{provider}/{model}"
 
     response = await litellm.acompletion(
