@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import type { AuthUser, LoginResponse, Role } from '@/types/auth'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
@@ -22,20 +22,19 @@ function decodeUsername(token: string): string {
   }
 }
 
-export function useAuth() {
-  const [token, setToken] = useState<string | null>(null)
-  const [user, setUser] = useState<AuthUser | null>(null)
+function initAuth(): { token: string | null; user: AuthUser | null } {
+  if (typeof window === 'undefined') return { token: null, user: null }
+  const stored = sessionStorage.getItem('access_token')
+  if (stored) {
+    const role = decodeRole(stored)
+    if (role) return { token: stored, user: { username: decodeUsername(stored), role } }
+  }
+  return { token: null, user: null }
+}
 
-  useEffect(() => {
-    const stored = sessionStorage.getItem('access_token')
-    if (stored) {
-      const role = decodeRole(stored)
-      if (role) {
-        setToken(stored)
-        setUser({ username: decodeUsername(stored), role })
-      }
-    }
-  }, [])
+export function useAuth() {
+  const [token, setToken] = useState<string | null>(() => initAuth().token)
+  const [user, setUser] = useState<AuthUser | null>(() => initAuth().user)
 
   const login = useCallback(async (username: string, password: string) => {
     const res = await fetch(`${API}/auth/login`, {

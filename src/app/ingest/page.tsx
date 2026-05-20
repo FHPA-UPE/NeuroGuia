@@ -20,7 +20,10 @@ export default function IngestPage() {
     if (res.ok) setDocs(await res.json())
   }
 
-  useEffect(() => { loadDocs() }, [])
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadDocs()
+  }, [])
 
   async function handleUpload(files: FileList | null) {
     if (!files?.length) return

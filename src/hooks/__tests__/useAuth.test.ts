@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
+import { useAuth } from '../useAuth'
 
 const mockFetch = jest.fn()
 global.fetch = mockFetch
@@ -9,10 +10,7 @@ beforeEach(() => {
 })
 
 test('inicia sem usuário logado', () => {
-  const { result } = renderHook(() => {
-    const { useAuth } = require('../useAuth')
-    return useAuth()
-  })
+  const { result } = renderHook(() => useAuth())
   expect(result.current.user).toBeNull()
   expect(result.current.token).toBeNull()
 })
@@ -22,7 +20,6 @@ test('login salva token no sessionStorage', async () => {
     ok: true,
     json: async () => ({ access_token: 'tok123', token_type: 'bearer', role: 'estudante' }),
   })
-  const { useAuth } = require('../useAuth')
   const { result } = renderHook(() => useAuth())
   await act(async () => {
     await result.current.login('alice', 'pass')
@@ -33,7 +30,6 @@ test('login salva token no sessionStorage', async () => {
 
 test('logout remove token do sessionStorage', async () => {
   sessionStorage.setItem('access_token', 'tok')
-  const { useAuth } = require('../useAuth')
   const { result } = renderHook(() => useAuth())
   act(() => { result.current.logout() })
   expect(sessionStorage.getItem('access_token')).toBeNull()
@@ -42,7 +38,6 @@ test('logout remove token do sessionStorage', async () => {
 
 test('login falho lança erro', async () => {
   mockFetch.mockResolvedValueOnce({ ok: false, status: 401 })
-  const { useAuth } = require('../useAuth')
   const { result } = renderHook(() => useAuth())
   await expect(act(async () => { await result.current.login('x', 'wrong') })).rejects.toThrow()
 })

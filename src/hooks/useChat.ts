@@ -36,7 +36,7 @@ export function useChat() {
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
-      let lastAssistantId = makeId()
+      const lastAssistantId = makeId()
 
       while (true) {
         const { done, value } = await reader.read()

@@ -1,12 +1,40 @@
 'use client'
 import { useState, useCallback, useRef, useEffect } from 'react'
 
-/// <reference lib="dom" />
+// Minimal type declarations for the Web Speech API (not yet fully in TypeScript's DOM lib)
+interface SpeechRecognitionResultItem {
+  transcript: string
+  confidence: number
+}
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionResultItem
+  length: number
+  isFinal: boolean
+}
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult
+  length: number
+}
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList
+}
+interface ISpeechRecognition extends EventTarget {
+  lang: string
+  interimResults: boolean
+  continuous: boolean
+  start(): void
+  stop(): void
+  addEventListener(type: 'result', listener: (e: SpeechRecognitionEvent) => void): void
+  addEventListener(type: 'end', listener: () => void): void
+}
+interface ISpeechRecognitionConstructor {
+  new(): ISpeechRecognition
+}
 
 declare global {
   interface Window {
-    SpeechRecognition?: typeof SpeechRecognition
-    webkitSpeechRecognition?: typeof SpeechRecognition
+    SpeechRecognition?: ISpeechRecognitionConstructor
+    webkitSpeechRecognition?: ISpeechRecognitionConstructor
   }
 }
 
@@ -14,7 +42,7 @@ export function useSpeech() {
   const [isListening, setIsListening] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [transcript, setTranscript] = useState('')
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const recognitionRef = useRef<ISpeechRecognition | null>(null)
 
   const supported =
     typeof window !== 'undefined' &&
@@ -31,9 +59,7 @@ export function useSpeech() {
     recognition.continuous = false
 
     recognition.addEventListener('result', (e: SpeechRecognitionEvent) => {
-      const current = Array.from(e.results)
-        .map((r) => r[0].transcript)
-        .join('')
+      const current = Array.from({ length: e.results.length }, (_, i) => e.results[i][0].transcript).join('')
       setTranscript(current)
     })
     recognition.addEventListener('end', () => setIsListening(false))
