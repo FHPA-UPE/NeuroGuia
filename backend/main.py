@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from routers import auth as auth_router
 from routers import chat as chat_router
+from routers import docs as docs_router
 
 load_dotenv()
 
@@ -13,7 +14,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="NeuroGuia API", lifespan=lifespan)
+app = FastAPI(title="NeuroGuia API", lifespan=lifespan, docs_url="/api-docs", redoc_url="/api-redoc")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +26,7 @@ app.add_middleware(
 
 app.include_router(auth_router.router)
 app.include_router(chat_router.router)
+app.include_router(docs_router.router)
 
 
 @app.get("/health")
