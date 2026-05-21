@@ -19,7 +19,7 @@ const STATES: { value: AvatarState; label: string }[] = [
 const MOVEMENTS: { value: Movement; label: string }[] = [
   { value: 'idle',    label: 'Repouso' },
   { value: 'talking', label: 'Falando' },
-  { value: 'thinking',label: 'Pensando' },
+  { value: 'thinking', label: 'Pensando' },
 ]
 
 export function EmotionControls({ visible, avatarState, movement, onStateChange, onMovementChange }: EmotionControlsProps) {
