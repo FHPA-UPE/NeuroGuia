@@ -13,17 +13,10 @@ interface Props {
 }
 
 export function ChatInput({
-  onSend,
-  disabled,
-  isListening,
-  isSpeaking,
-  speechSupported,
-  onToggleListen,
-  onToggleSpeak,
-  transcript = '',
+  onSend, disabled, isListening, isSpeaking,
+  speechSupported, onToggleListen, onToggleSpeak, transcript = '',
 }: Props) {
   const [text, setText] = useState('')
-
   const value = transcript || text
 
   function handleSubmit(e: React.FormEvent) {
@@ -36,52 +29,62 @@ export function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2 p-3 bg-pure-white border-t border-mist"
+      className="flex items-center gap-2 px-4 py-4 bg-cream-card border-t border-mist shadow-[0_-4px_12px_rgba(0,0,0,0.06)]"
     >
       {speechSupported && (
         <button
           type="button"
           aria-label={isListening ? 'Parar gravação' : 'Iniciar microfone'}
           onClick={onToggleListen}
-          className={`w-11 h-11 rounded-btn flex items-center justify-center text-xl transition-colors ${
+          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 ${
             isListening
-              ? 'bg-crimson text-white animate-pulse'
-              : 'bg-frost hover:bg-mist text-midnight'
+              ? 'bg-error text-white animate-pulse'
+              : 'bg-mist hover:bg-owl-orange-soft text-ink'
           }`}
         >
-          🎤
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="9" y="2" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="2" />
+            <path d="M5 10a7 7 0 0114 0M12 19v3M9 22h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
         </button>
       )}
+
       <input
         type="text"
         value={value}
-        onChange={(e) => setText(e.target.value)}
+        onChange={e => setText(e.target.value)}
         placeholder="Digite ou fale sua dúvida…"
         disabled={disabled}
-        className="flex-1 rounded-btn border border-mist px-4 py-2.5 text-base bg-ice-white disabled:opacity-60 focus-visible:outline-calm-indigo"
+        className="flex-1 rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] placeholder:text-slate-text/60 disabled:opacity-60 focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
         aria-label="Mensagem para o OWL"
       />
+
       {speechSupported && (
         <button
           type="button"
           aria-label={isSpeaking ? 'Silenciar OWL' : 'OWL falar em voz alta'}
           onClick={onToggleSpeak}
-          className={`w-11 h-11 rounded-btn flex items-center justify-center text-xl transition-colors ${
+          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 ${
             isSpeaking
-              ? 'bg-calm-indigo text-white'
-              : 'bg-frost hover:bg-mist text-midnight'
+              ? 'bg-owl-orange text-white'
+              : 'bg-mist hover:bg-owl-orange-soft text-ink'
           }`}
         >
-          🔊
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </button>
       )}
+
       <button
         type="submit"
         disabled={disabled || !value.trim()}
         aria-label="Enviar mensagem"
-        className="bg-calm-indigo hover:bg-deep-indigo text-white rounded-btn py-2.5 px-5 font-semibold disabled:opacity-50 transition-colors min-h-[44px]"
+        className="w-11 h-11 rounded-full bg-owl-orange hover:bg-owl-orange-dark text-white flex items-center justify-center disabled:opacity-50 transition-colors flex-shrink-0"
       >
-        Enviar
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
     </form>
   )
