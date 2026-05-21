@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { render, screen, cleanup } from '@testing-library/react'
 import OllieAvatar from './OllieAvatar'
 
 describe('OllieAvatar', () => {
@@ -53,13 +53,15 @@ describe('OllieAvatar', () => {
     expect(container.querySelector('svg')).toBeInTheDocument()
   })
 
-  it('renderiza diferentes expressões: happy inclina cabeça diferente de neutral', () => {
-    const { rerender, container } = render(<OllieAvatar avatarState="neutral" movement="idle" />)
+  it('grupo da cabeça inclina diferente entre estados com tilt diferente', () => {
+    render(<OllieAvatar avatarState="neutral" movement="idle" />)
     const neutralTransform = screen.getByTestId('ollie-head-group').getAttribute('transform')
-    rerender(<OllieAvatar avatarState="happy" movement="idle" />)
-    const happyTransform = container.querySelector('[data-testid="ollie-head-group"]')?.getAttribute('transform')
-    // neutral headTilt=0, happy headTilt=0 too, but this verifies both render without error
-    expect(neutralTransform).toBeDefined()
-    expect(happyTransform).toBeDefined()
+    expect(neutralTransform).toBe('rotate(0, 100, 80)')
+
+    cleanup()
+
+    render(<OllieAvatar avatarState="empathetic" movement="idle" />)
+    const empatheticTransform = screen.getByTestId('ollie-head-group').getAttribute('transform')
+    expect(empatheticTransform).not.toBe('rotate(0, 100, 80)')
   })
 })

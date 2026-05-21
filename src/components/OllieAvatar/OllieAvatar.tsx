@@ -18,6 +18,14 @@ interface ExpressionConfig {
   headTilt: number
 }
 
+const EYE_RY: Record<ExpressionConfig['eyeShape'], number> = {
+  open:    23,
+  relaxed: 20,
+  squint:  16,
+  soft:    18,
+  focused: 22,
+}
+
 const MOVEMENT_CLASS: Record<Movement, string> = {
   idle: 'ollie-idle',
   talking: 'ollie-talking',
@@ -81,6 +89,9 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
   const expr = EXPRESSIONS[avatarState]
   const motionClass = MOVEMENT_CLASS[movement]
   const headTransform = `rotate(${expr.headTilt}, 100, 80)`
+  const eyeRy        = EYE_RY[expr.eyeShape]
+  const leftPupilCy  = expr.leftPupil.cy  + expr.eyeLidOffset
+  const rightPupilCy = expr.rightPupil.cy + expr.eyeLidOffset
 
   const beakLowerPath = beakOpen
     ? 'M 84,114 Q 100,134 116,114 L 114,121 Q 100,140 86,121 Z'
@@ -119,14 +130,14 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
           </g>
 
           {/* Left eye */}
-          <ellipse cx="72" cy="88" rx="18" ry="20" fill="white" stroke="rgba(28,14,0,0.7)" strokeWidth="1" />
-          <circle cx={expr.leftPupil.cx} cy={expr.leftPupil.cy} r="9" fill="#1C0E00" />
-          <circle cx={expr.leftPupil.cx + 3} cy={expr.leftPupil.cy - 3} r="3" fill="white" opacity="0.8" />
+          <ellipse cx="72" cy="88" rx="18" ry={eyeRy} fill="white" stroke="rgba(28,14,0,0.7)" strokeWidth="1" />
+          <circle cx={expr.leftPupil.cx} cy={leftPupilCy} r="9" fill="#1C0E00" />
+          <circle cx={expr.leftPupil.cx + 3} cy={leftPupilCy - 3} r="3" fill="white" opacity="0.8" />
 
           {/* Right eye */}
-          <ellipse cx="128" cy="88" rx="18" ry="20" fill="white" stroke="rgba(28,14,0,0.7)" strokeWidth="1" />
-          <circle cx={expr.rightPupil.cx} cy={expr.rightPupil.cy} r="9" fill="#1C0E00" />
-          <circle cx={expr.rightPupil.cx + 3} cy={expr.rightPupil.cy - 3} r="3" fill="white" opacity="0.8" />
+          <ellipse cx="128" cy="88" rx="18" ry={eyeRy} fill="white" stroke="rgba(28,14,0,0.7)" strokeWidth="1" />
+          <circle cx={expr.rightPupil.cx} cy={rightPupilCy} r="9" fill="#1C0E00" />
+          <circle cx={expr.rightPupil.cx + 3} cy={rightPupilCy - 3} r="3" fill="white" opacity="0.8" />
 
           {/* Brows */}
           <path d={expr.leftBrow} fill="none" stroke="#7A4A10" strokeWidth="3" strokeLinecap="round" />
