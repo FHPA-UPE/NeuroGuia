@@ -73,6 +73,7 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
           </Link>
         )}
         <button
+          type="button"
           onClick={handleLogout}
           className="text-slate-text hover:text-ink min-h-[44px] px-2"
         >

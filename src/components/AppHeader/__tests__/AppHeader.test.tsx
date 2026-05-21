@@ -60,7 +60,7 @@ test('avatar do usuário exibe inicial do username', () => {
 
 test('Configurações visível apenas para role admin', () => {
   mockPathname.mockReturnValue('/chat')
-  mockAuth.mockReturnValue({ user: { username: 'aluno', role: 'student' }, logout: jest.fn() })
+  mockAuth.mockReturnValue({ user: { username: 'aluno', role: 'estudante' }, logout: jest.fn() })
   render(<AppHeader />)
   expect(screen.queryByText('Configurações')).toBeNull()
 })
