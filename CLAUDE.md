@@ -23,13 +23,13 @@ Types live in `src/types/chat.ts`:
 - `AvatarState`: `neutral | happy | encouraging | empathetic | thoughtful`
 - `Movement`: `idle | talking | thinking`
 
-### OLLIE avatar
+### OWL avatar
 
-`OllieAvatar` is a fully inline SVG owl with no external asset dependency. Expression geometry (brow paths, beak path, pupil positions, eye shape, head tilt) is driven by the `EXPRESSIONS` map keyed on `AvatarState`. Animations are pure CSS classes (`ollie-idle`, `ollie-talking`, `ollie-thinking`) defined in `src/app/globals.css` and applied to the wrapper `<div>`. The `.ollie-beak-bottom` element gets an additional `ollie-talk` keyframe when `movement === 'talking'`.
+`OwlAvatar` (`src/components/OwlAvatar/index.tsx`) is a fully inline SVG owl with no external asset dependency. Expression geometry (brow paths, beak path, pupil positions, eye shape, head tilt) is driven by the `EXPRESSIONS` map keyed on `AvatarState`. Animations are pure CSS classes (`owl-idle`, `owl-talking`, `owl-thinking`) defined in `src/app/globals.css` and applied to the wrapper `<div>`. The beak element gets an additional `owl-talk` keyframe when `movement === 'talking'`.
 
 ### Layout and styling
 
-The page is split vertically: top half contains the avatar + `EmotionControls` + `QuickReply` + `ChatInput`; bottom half is a scrollable message list (`ChatBubble`s). Primary colors: `#2D5016` (forest green) and `#C8860A` (amber). Font: Atkinson Hyperlegible (loaded via `next/font/google`) — chosen for accessibility/readability for neurodivergent users. `prefers-reduced-motion` is respected in `globals.css`.
+The chat page has a fixed header (with the PPGEC UPE logo on admin screens), an OWL avatar zone at the top, a scrollable message list (`ChatBubble`s), and a fixed `ChatInput` at the bottom. `EmotionControls` and `QuickReply` float above the input area. Primary palette: `#F5820D` (amber-orange), `#7C5CBF` (soft violet), background `#FFFBF4` (warm cream). Font: Atkinson Hyperlegible (loaded via `next/font/google`) — chosen for accessibility/readability for neurodivergent users. `prefers-reduced-motion` is respected in `globals.css`.
 
 ### Backend contract
 
