@@ -4,8 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useChat } from '@/hooks/useChat'
 import { useSpeech } from '@/hooks/useSpeech'
+import { useTTS } from '@/hooks/useTTS'
 import { AppHeader } from '@/components/AppHeader'
-import { OwlAvatar } from '@/components/OwlAvatar'
+import OllieAvatar from '@/components/OllieAvatar/OllieAvatar'
 import { ChatBubble } from '@/components/ChatBubble'
 import { ChatInput } from '@/components/ChatInput'
 import { EmotionControls } from '@/components/EmotionControls'
@@ -28,9 +29,12 @@ export default function ChatPage() {
   const { user, logout } = useAuth()
   const router = useRouter()
   const { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement } = useChat()
-  const { isListening, isSpeaking, transcript, supported, startListening, stopListening, speak, cancel } = useSpeech()
-  const [beakOpen, setBeakOpen] = useState(false)
+  const { isListening, isSpeaking: speechIsSpeaking, transcript, supported, startListening, stopListening } = useSpeech()
   const [audioEnabled, setAudioEnabled] = useState(false)
+  const lastAssistantText =
+    messages.filter((m) => m.role === 'assistant').at(-1)?.content ?? null
+  const { isSpeaking: ttsIsSpeaking, beakOpen } = useTTS(audioEnabled ? lastAssistantText : null)
+  const effectiveMovement = ttsIsSpeaking ? 'talking' : movement
   const [showLgpdModal, setShowLgpdModal] = useState(false)
   const [lgpdAccepted, setLgpdAccepted] = useState(false)
   const [showRating, setShowRating] = useState(false)
@@ -39,16 +43,6 @@ export default function ChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
-
-  useEffect(() => {
-    const lastMsg = messages.at(-1)
-    if (lastMsg?.role === 'assistant' && audioEnabled && lastMsg.content) {
-      speak(lastMsg.content, () => {
-        setBeakOpen(true)
-        setTimeout(() => setBeakOpen(false), 120)
-      })
-    }
-  }, [messages, audioEnabled, speak])
 
   useEffect(() => {
     function onBeforeUnload(e: BeforeUnloadEvent) {
@@ -64,11 +58,10 @@ export default function ChatPage() {
   }
 
   function handleToggleSpeak() {
-    if (isSpeaking) { cancel(); return }
     setAudioEnabled(a => !a)
   }
 
-  function handleSend(text: string) { cancel(); sendMessage(text) }
+  function handleSend(text: string) { sendMessage(text) }
 
   function handleFeedback(messageId: string, rating: 'up' | 'down') {
     const msg = messages.find(m => m.id === messageId)
@@ -112,7 +105,11 @@ export default function ChatPage() {
           className="flex flex-col items-center pt-5 pb-3 shrink-0"
           style={{ backgroundColor: STAGE_COLORS[avatarState], transition: 'background-color 0.4s ease' }}
         >
-          <OwlAvatar state={avatarState} movement={movement} beakOpen={beakOpen} aria-label={`OWL assistente, expressão: ${avatarState}`} />
+          <OllieAvatar
+            avatarState={avatarState}
+            movement={effectiveMovement}
+            beakOpen={beakOpen}
+          />
           <EmotionControls
             visible={user?.role === 'admin'}
             avatarState={avatarState}
@@ -151,7 +148,7 @@ export default function ChatPage() {
             onSend={handleSend}
             disabled={isLoading}
             isListening={isListening}
-            isSpeaking={isSpeaking || audioEnabled}
+            isSpeaking={speechIsSpeaking || ttsIsSpeaking}
             speechSupported={supported}
             onToggleListen={handleToggleListen}
             onToggleSpeak={handleToggleSpeak}
