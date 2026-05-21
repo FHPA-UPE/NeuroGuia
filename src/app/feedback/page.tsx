@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { AppHeader } from '@/components/AppHeader'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 function token() { return sessionStorage.getItem('access_token') ?? '' }
@@ -27,61 +28,80 @@ export default function FeedbackPage() {
     URL.revokeObjectURL(url)
   }
 
-  if (error) return <main className="p-6 text-crimson">{error}</main>
-  if (!data) return <main className="p-6 text-silver">Carregando…</main>
+  if (error) return <><AppHeader /><main className="p-6 text-error">{error}</main></>
+  if (!data) return <><AppHeader /><main className="p-6 text-slate-text">Carregando…</main></>
 
   const emojiCount = { happy: 0, neutral: 0, sad: 0 }
   for (const s of data.sessions) emojiCount[s.emoji as keyof typeof emojiCount]++
 
   return (
-    <main className="max-w-3xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-midnight">Feedback</h1>
-        <button onClick={handleExport}
-          className="bg-calm-indigo hover:bg-deep-indigo text-white rounded-btn py-2 px-4 text-sm font-semibold transition-colors">
-          Exportar CSV
-        </button>
-      </div>
-
-      <section aria-label="Satisfação das sessões" className="bg-pure-white rounded-card border border-mist p-5 mb-6">
-        <h2 className="text-lg font-semibold text-midnight mb-3">Satisfação ({data.sessions.length} sessões)</h2>
-        <div className="flex gap-6 text-2xl">
-          <span title="Satisfeito">😊 <span className="text-base text-midnight font-bold">{emojiCount.happy}</span></span>
-          <span title="Neutro">😐 <span className="text-base text-midnight font-bold">{emojiCount.neutral}</span></span>
-          <span title="Insatisfeito">😞 <span className="text-base text-midnight font-bold">{emojiCount.sad}</span></span>
+    <>
+      <AppHeader />
+      <main id="main-content" className="max-w-3xl mx-auto px-6 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-ink pl-4 border-l-4 border-owl-orange">Feedback</h1>
+          <button
+            onClick={handleExport}
+            className="border-[1.5px] border-owl-orange text-owl-orange hover:bg-owl-orange hover:text-white rounded-2xl py-2 px-4 text-sm font-semibold transition-colors min-h-[44px]"
+          >
+            Exportar CSV
+          </button>
         </div>
-      </section>
 
-      <section aria-label="Respostas com avaliação negativa" className="bg-pure-white rounded-card border border-mist p-5 mb-6">
-        <h2 className="text-lg font-semibold text-midnight mb-3">Respostas 👎 ({data.negative_messages.length})</h2>
-        {data.negative_messages.length === 0
-          ? <p className="text-silver text-sm">Nenhuma avaliação negativa ainda.</p>
-          : <ul className="space-y-4">
-              {data.negative_messages.map((m, i) => (
-                <li key={i} className="border-t border-mist pt-3">
-                  <p className="text-sm font-medium text-midnight">P: {m.question}</p>
-                  <p className="text-sm text-slate-text mt-1">R: {m.answer}</p>
-                  <p className="text-xs text-silver mt-1">{m.sources.join(', ')}</p>
-                </li>
-              ))}
-            </ul>
-        }
-      </section>
+        <section aria-label="Satisfação das sessões" className="bg-cream-card rounded-2xl border border-mist p-5 mb-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-ink mb-4">Satisfação ({data.sessions.length} sessões)</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { emoji: '😊', label: 'Satisfeito',   count: emojiCount.happy,   bg: 'bg-success/10' },
+              { emoji: '😐', label: 'Neutro',        count: emojiCount.neutral, bg: 'bg-owl-orange/10' },
+              { emoji: '😞', label: 'Insatisfeito',  count: emojiCount.sad,     bg: 'bg-error/10' },
+            ].map(({ emoji, label, count, bg }) => (
+              <div key={label} className={`${bg} rounded-2xl p-4 flex flex-col items-center gap-1`}>
+                <span className="text-3xl" aria-hidden="true">{emoji}</span>
+                <span className="text-2xl font-bold text-ink">{count}</span>
+                <span className="text-xs text-slate-text">{label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <section aria-label="Lacunas no RAG" className="bg-pure-white rounded-card border border-mist p-5">
-        <h2 className="text-lg font-semibold text-midnight mb-3">Lacunas RAG (sem fonte identificada)</h2>
-        {data.rag_gaps.length === 0
-          ? <p className="text-silver text-sm">Nenhuma lacuna registrada.</p>
-          : <ul className="space-y-2">
-              {data.rag_gaps.map((g, i) => (
-                <li key={i} className="flex items-center justify-between border-t border-mist pt-2">
-                  <span className="text-sm text-midnight">{g.question}</span>
-                  <span className="text-sm font-bold text-warm-terracotta">{g.count}×</span>
-                </li>
-              ))}
-            </ul>
-        }
-      </section>
-    </main>
+        <section aria-label="Respostas com avaliação negativa" className="bg-cream-card rounded-2xl border border-mist p-5 mb-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-ink mb-3">Respostas 👎 ({data.negative_messages.length})</h2>
+          {data.negative_messages.length === 0
+            ? <p className="text-slate-text text-sm">Nenhuma avaliação negativa ainda.</p>
+            : (
+              <ul className="space-y-3">
+                {data.negative_messages.map((m, i) => (
+                  <li key={i} className="border-l-4 border-error bg-error/5 rounded-r-xl pl-4 pr-3 py-3">
+                    <p className="text-sm font-semibold text-ink">P: {m.question}</p>
+                    <p className="text-sm text-slate-text mt-1">R: {m.answer}</p>
+                    <p className="text-xs text-slate-text/60 mt-1">{m.sources.join(', ')}</p>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </section>
+
+        <section aria-label="Lacunas no RAG" className="bg-cream-card rounded-2xl border border-mist p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-ink mb-3">Lacunas RAG (sem fonte identificada)</h2>
+          {data.rag_gaps.length === 0
+            ? <p className="text-slate-text text-sm">Nenhuma lacuna registrada.</p>
+            : (
+              <ul className="space-y-2">
+                {data.rag_gaps.map((g, i) => (
+                  <li key={i} className="flex items-center justify-between border-t border-mist pt-2">
+                    <span className="text-sm text-ink">{g.question}</span>
+                    <span className="text-sm font-bold text-owl-orange-dark bg-owl-orange-soft rounded-full px-2 py-0.5">
+                      {g.count}×
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </section>
+      </main>
+    </>
   )
 }
