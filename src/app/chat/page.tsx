@@ -31,8 +31,9 @@ export default function ChatPage() {
   const { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement } = useChat()
   const { isListening, isSpeaking: speechIsSpeaking, transcript, supported, startListening, stopListening } = useSpeech()
   const [audioEnabled, setAudioEnabled] = useState(false)
-  const lastAssistantText =
-    messages.filter((m) => m.role === 'assistant').at(-1)?.content ?? null
+  const lastAssistantText = !isLoading
+    ? messages.filter((m) => m.role === 'assistant').at(-1)?.content ?? null
+    : null
   const { isSpeaking: ttsIsSpeaking, beakOpen } = useTTS(audioEnabled ? lastAssistantText : null)
   const effectiveMovement = ttsIsSpeaking ? 'talking' : movement
   const [showLgpdModal, setShowLgpdModal] = useState(false)
@@ -124,7 +125,7 @@ export default function ChatPage() {
           id="main-content"
           className="flex-1 overflow-y-auto px-4 py-4"
           aria-live="polite"
-          aria-label="Conversa com OWL"
+          aria-label="Conversa com OLLIE"
         >
           {messages.map(msg => (
             <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} />
