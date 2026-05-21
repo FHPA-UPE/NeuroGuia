@@ -1,4 +1,5 @@
 'use client'
+import { useId } from 'react'
 import type { AvatarState, Movement } from '@/types/chat'
 
 interface OllieAvatarProps {
@@ -82,6 +83,7 @@ const EXPRESSIONS: Record<AvatarState, ExpressionConfig> = {
 }
 
 export default function OllieAvatar({ avatarState, movement, beakOpen = false }: OllieAvatarProps) {
+  const uid          = useId().replace(/:/g, '')
   const expr         = EXPRESSIONS[avatarState]
   const eyeRy        = EYE_RY[expr.eyeShape]
   const leftPupilCy  = expr.leftPupil.cy  + expr.eyeLidOffset
@@ -102,48 +104,48 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
         aria-hidden="true"
       >
         <defs>
-          <clipPath id="ollieLeftEyeClip">
+          <clipPath id={`ollieLeftEyeClip-${uid}`}>
             <ellipse cx="78" cy="82" rx="22" ry={eyeRy} />
           </clipPath>
-          <clipPath id="ollieRightEyeClip">
+          <clipPath id={`ollieRightEyeClip-${uid}`}>
             <ellipse cx="122" cy="82" rx="22" ry={eyeRy} />
           </clipPath>
 
-          <radialGradient id="ollieHeadGrad" cx="40%" cy="32%" r="65%" gradientUnits="objectBoundingBox">
+          <radialGradient id={`ollieHeadGrad-${uid}`} cx="40%" cy="32%" r="65%" gradientUnits="objectBoundingBox">
             <stop offset="0%"   stopColor="#FBC04A" />
             <stop offset="55%"  stopColor="#E0900F" />
             <stop offset="100%" stopColor="#8A4A05" />
           </radialGradient>
 
-          <radialGradient id="ollieBodyGrad" cx="45%" cy="28%" r="70%" gradientUnits="objectBoundingBox">
+          <radialGradient id={`ollieBodyGrad-${uid}`} cx="45%" cy="28%" r="70%" gradientUnits="objectBoundingBox">
             <stop offset="0%"   stopColor="#F4AE26" />
             <stop offset="55%"  stopColor="#D9870C" />
             <stop offset="100%" stopColor="#834505" />
           </radialGradient>
 
-          <radialGradient id="ollieBellyGrad" cx="50%" cy="32%" r="62%" gradientUnits="objectBoundingBox">
+          <radialGradient id={`ollieBellyGrad-${uid}`} cx="50%" cy="32%" r="62%" gradientUnits="objectBoundingBox">
             <stop offset="0%"   stopColor="#FFFFFF" />
             <stop offset="78%"  stopColor="#F4EEE2" />
             <stop offset="100%" stopColor="#E2DACB" />
           </radialGradient>
 
-          <radialGradient id="ollieWingGrad" cx="50%" cy="28%" r="72%" gradientUnits="objectBoundingBox">
+          <radialGradient id={`ollieWingGrad-${uid}`} cx="50%" cy="28%" r="72%" gradientUnits="objectBoundingBox">
             <stop offset="0%"   stopColor="#C9870E" />
             <stop offset="100%" stopColor="#6E3A03" />
           </radialGradient>
 
-          <radialGradient id="ollieFaceDiscGrad" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
+          <radialGradient id={`ollieFaceDiscGrad-${uid}`} cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
             <stop offset="0%"   stopColor="#FCE4A6" stopOpacity="0.55" />
             <stop offset="100%" stopColor="#FCE4A6" stopOpacity="0" />
           </radialGradient>
 
-          <radialGradient id="ollieHatGrad" cx="42%" cy="22%" r="80%" gradientUnits="objectBoundingBox">
+          <radialGradient id={`ollieHatGrad-${uid}`} cx="42%" cy="22%" r="80%" gradientUnits="objectBoundingBox">
             <stop offset="0%"   stopColor="#F2A91E" />
             <stop offset="55%"  stopColor="#D2820B" />
             <stop offset="100%" stopColor="#9A5604" />
           </radialGradient>
 
-          <radialGradient id="ollieHatTopGrad" cx="42%" cy="22%" r="85%" gradientUnits="objectBoundingBox">
+          <radialGradient id={`ollieHatTopGrad-${uid}`} cx="42%" cy="22%" r="85%" gradientUnits="objectBoundingBox">
             <stop offset="0%"   stopColor="#F4B12A" />
             <stop offset="60%"  stopColor="#D9870C" />
             <stop offset="100%" stopColor="#8F5004" />
@@ -154,8 +156,8 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
         <ellipse cx="100" cy="236" rx="56" ry="6" fill="#3A1C00" opacity="0.18" />
 
         {/* Wings */}
-        <ellipse cx="38"  cy="160" rx="26" ry="54" fill="url(#ollieWingGrad)" transform="rotate(-14 38 160)" />
-        <ellipse cx="162" cy="160" rx="26" ry="54" fill="url(#ollieWingGrad)" transform="rotate(14 162 160)" />
+        <ellipse cx="38"  cy="160" rx="26" ry="54" fill={`url(#ollieWingGrad-${uid})`} transform="rotate(-14 38 160)" />
+        <ellipse cx="162" cy="160" rx="26" ry="54" fill={`url(#ollieWingGrad-${uid})`} transform="rotate(14 162 160)" />
 
         {/* Wing feather detail lines */}
         <path d="M 28,148 Q 34,155 28,162" stroke="#4F2C00" strokeWidth="1.5" fill="none" opacity="0.55" />
@@ -164,10 +166,10 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
         <path d="M 178,158 Q 172,165 178,172" stroke="#4F2C00" strokeWidth="1.5" fill="none" opacity="0.55" />
 
         {/* Body */}
-        <ellipse cx="100" cy="168" rx="72" ry="60" fill="url(#ollieBodyGrad)" />
+        <ellipse cx="100" cy="168" rx="72" ry="60" fill={`url(#ollieBodyGrad-${uid})`} />
 
         {/* Belly */}
-        <ellipse cx="100" cy="178" rx="44" ry="52" fill="url(#ollieBellyGrad)" />
+        <ellipse cx="100" cy="178" rx="44" ry="52" fill={`url(#ollieBellyGrad-${uid})`} />
 
         {/* Belly feather texture — 3 rows */}
         <path d="M 87,158 Q 93,165 100,158"   stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
@@ -180,29 +182,29 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
         <g data-testid="ollie-head-group" transform={`rotate(${expr.headTilt}, 100, 80)`}>
 
           {/* Head circle */}
-          <circle cx="100" cy="80" r="54" fill="url(#ollieHeadGrad)" />
+          <circle cx="100" cy="80" r="54" fill={`url(#ollieHeadGrad-${uid})`} />
 
           {/* Facial disc overlay */}
-          <ellipse cx="100" cy="84" rx="46" ry="44" fill="url(#ollieFaceDiscGrad)" />
+          <ellipse cx="100" cy="84" rx="46" ry="44" fill={`url(#ollieFaceDiscGrad-${uid})`} />
 
           {/* Left ear tuft — 3 overlapping polygons for feather texture */}
-          <polygon points="70,33 58,8 80,26"  fill="url(#ollieHeadGrad)" />
-          <polygon points="65,33 55,12 74,28" fill="url(#ollieHeadGrad)" opacity="0.85" />
-          <polygon points="75,33 63,8 84,27"  fill="url(#ollieHeadGrad)" opacity="0.7" />
+          <polygon points="70,33 58,8 80,26"  fill={`url(#ollieHeadGrad-${uid})`} />
+          <polygon points="65,33 55,12 74,28" fill={`url(#ollieHeadGrad-${uid})`} opacity="0.85" />
+          <polygon points="75,33 63,8 84,27"  fill={`url(#ollieHeadGrad-${uid})`} opacity="0.7" />
 
           {/* Right ear tuft — 3 overlapping polygons */}
-          <polygon points="130,33 142,8 120,26"  fill="url(#ollieHeadGrad)" />
-          <polygon points="135,33 145,12 126,28" fill="url(#ollieHeadGrad)" opacity="0.85" />
-          <polygon points="125,33 137,8 116,27"  fill="url(#ollieHeadGrad)" opacity="0.7" />
+          <polygon points="130,33 142,8 120,26"  fill={`url(#ollieHeadGrad-${uid})`} />
+          <polygon points="135,33 145,12 126,28" fill={`url(#ollieHeadGrad-${uid})`} opacity="0.85" />
+          <polygon points="125,33 137,8 116,27"  fill={`url(#ollieHeadGrad-${uid})`} opacity="0.7" />
 
           {/* Mortarboard hat — wide brim */}
-          <rect x="16" y="36" width="168" height="13" rx="5" fill="url(#ollieHatGrad)" />
+          <rect x="16" y="36" width="168" height="13" rx="5" fill={`url(#ollieHatGrad-${uid})`} />
           {/* White band */}
           <rect x="48" y="28" width="104" height="10" rx="3" fill="#F8F3EA" />
           {/* Hat top */}
-          <rect x="55" y="1" width="90" height="29" rx="6" fill="url(#ollieHatTopGrad)" />
-          {/* Tassel cord */}
-          <line x1="143" y1="10" x2="172" y2="30" stroke="#7A3E00" strokeWidth="2.5" />
+          <rect x="55" y="1" width="90" height="29" rx="6" fill={`url(#ollieHatTopGrad-${uid})`} />
+          {/* Tassel cord — rendered after hat top so it appears on top */}
+          <line x1="144" y1="8" x2="172" y2="30" stroke="#7A3E00" strokeWidth="2.5" />
           {/* Tassel pompom — double circle for volume */}
           <circle cx="174" cy="33" r="7" fill="#7A3E00" />
           <circle cx="174" cy="33" r="4" fill="#A85E08" />
@@ -212,11 +214,11 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
           <ellipse data-testid="ollie-right-eye" cx="122" cy="82" rx="22" ry={eyeRy} fill="white" />
 
           {/* Pupils with specular highlight */}
-          <g clipPath="url(#ollieLeftEyeClip)">
+          <g clipPath={`url(#ollieLeftEyeClip-${uid})`}>
             <circle cx={expr.leftPupil.cx}      cy={leftPupilCy}      r="13"  fill="#1a1a1a" />
             <circle cx={expr.leftPupil.cx + 5}  cy={leftPupilCy  - 5} r="4.5" fill="white" />
           </g>
-          <g clipPath="url(#ollieRightEyeClip)">
+          <g clipPath={`url(#ollieRightEyeClip-${uid})`}>
             <circle cx={expr.rightPupil.cx}     cy={rightPupilCy}     r="13"  fill="#1a1a1a" />
             <circle cx={expr.rightPupil.cx + 5} cy={rightPupilCy - 5} r="4.5" fill="white" />
           </g>
