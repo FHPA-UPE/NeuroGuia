@@ -59,7 +59,7 @@ export default function LoginPage() {
               onChange={e => setUsername(e.target.value)}
               required
               autoComplete="username"
-              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
+              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm font-medium text-ink">
@@ -70,7 +70,7 @@ export default function LoginPage() {
               onChange={e => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
+              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
             />
           </label>
 
@@ -83,7 +83,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-owl-orange hover:bg-owl-orange-dark text-white rounded-2xl py-3.5 px-5 font-semibold disabled:opacity-60 transition-colors min-h-[48px] flex items-center justify-center gap-2"
+            className="bg-owl-orange hover:bg-owl-orange-dark text-ink rounded-2xl py-3.5 px-5 font-semibold disabled:opacity-60 transition-colors min-h-[48px] flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

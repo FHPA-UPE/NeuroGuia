@@ -102,7 +102,7 @@ export default function IngestPage() {
           <button
             onClick={handleIngest}
             disabled={ingesting}
-            className="mt-4 bg-owl-orange hover:bg-owl-orange-dark text-white rounded-2xl py-2.5 px-5 font-semibold disabled:opacity-60 transition-colors flex items-center gap-2 min-h-[44px]"
+            className="mt-4 bg-owl-orange hover:bg-owl-orange-dark text-ink rounded-2xl py-2.5 px-5 font-semibold disabled:opacity-60 transition-colors flex items-center gap-2 min-h-[44px]"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <polygon points="5,3 19,12 5,21" fill="currentColor" />

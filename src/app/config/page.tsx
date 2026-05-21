@@ -34,7 +34,7 @@ export default function ConfigPage() {
     if (res.ok) setSaved(true); else setError('Erro ao salvar')
   }
 
-  const fieldClass = 'rounded-xl border border-mist px-4 py-3 bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60'
+  const fieldClass = 'rounded-xl border border-mist px-4 py-3 bg-cream min-h-[48px] focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark'
 
   return (
     <>
@@ -50,7 +50,7 @@ export default function ConfigPage() {
                 rows={10}
                 value={cfg.system_prompt}
                 onChange={e => setCfg(c => ({ ...c, system_prompt: e.target.value }))}
-                className="rounded-2xl border border-mist px-5 py-3.5 text-sm bg-cream font-mono focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
+                className="rounded-2xl border border-mist px-5 py-3.5 text-sm bg-cream font-mono focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
               />
             </label>
           </div>
@@ -102,7 +102,7 @@ export default function ConfigPage() {
             {[['Anthropic', cfg.anthropic_api_key], ['OpenAI', cfg.openai_api_key], ['Google', cfg.google_api_key]].map(([name, val]) => (
               <p key={name} className="text-sm text-slate-text">{name}: <code className="font-mono text-xs">{val || '—'}</code></p>
             ))}
-            <p className="text-xs text-slate-text/60 mt-1">Para alterar chaves, edite o arquivo backend/.env</p>
+            <p className="text-xs text-slate-text mt-1">Para alterar chaves, edite o arquivo backend/.env</p>
           </div>
 
           {error && (
@@ -117,7 +117,7 @@ export default function ConfigPage() {
           )}
 
           <button type="submit"
-            className="bg-owl-orange hover:bg-owl-orange-dark text-white rounded-2xl py-2.5 px-5 font-semibold self-start transition-colors min-h-[44px]">
+            className="bg-owl-orange hover:bg-owl-orange-dark text-ink rounded-2xl py-2.5 px-5 font-semibold self-start transition-colors min-h-[44px]">
             Salvar
           </button>
         </form>

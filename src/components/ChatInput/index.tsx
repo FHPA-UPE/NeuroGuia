@@ -55,7 +55,7 @@ export function ChatInput({
         onChange={e => setText(e.target.value)}
         placeholder="Digite ou fale sua dúvida…"
         disabled={disabled}
-        className="flex-1 rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] placeholder:text-slate-text/60 disabled:opacity-60 focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
+        className="flex-1 rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] placeholder:text-slate-text/60 disabled:opacity-60 focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
         aria-label="Mensagem para o OWL"
       />
 
@@ -66,7 +66,7 @@ export function ChatInput({
           onClick={onToggleSpeak}
           className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 ${
             isSpeaking
-              ? 'bg-owl-orange text-white'
+              ? 'bg-owl-orange text-ink'
               : 'bg-mist hover:bg-owl-orange-soft text-ink'
           }`}
         >
@@ -80,7 +80,7 @@ export function ChatInput({
         type="submit"
         disabled={disabled || !value.trim()}
         aria-label="Enviar mensagem"
-        className="w-11 h-11 rounded-full bg-owl-orange hover:bg-owl-orange-dark text-white flex items-center justify-center disabled:opacity-50 transition-colors flex-shrink-0"
+        className="w-11 h-11 rounded-full bg-owl-orange hover:bg-owl-orange-dark text-ink flex items-center justify-center disabled:opacity-50 transition-colors flex-shrink-0"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

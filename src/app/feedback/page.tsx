@@ -42,7 +42,7 @@ export default function FeedbackPage() {
           <h1 className="text-2xl font-bold text-ink pl-4 border-l-4 border-owl-orange">Feedback</h1>
           <button
             onClick={handleExport}
-            className="border-[1.5px] border-owl-orange text-owl-orange hover:bg-owl-orange hover:text-white rounded-2xl py-2 px-4 text-sm font-semibold transition-colors min-h-[44px]"
+            className="border-[1.5px] border-owl-orange text-owl-orange-dark hover:bg-owl-orange hover:text-ink rounded-2xl py-2 px-4 text-sm font-semibold transition-colors min-h-[44px]"
           >
             Exportar CSV
           </button>

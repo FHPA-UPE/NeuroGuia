@@ -15,7 +15,7 @@ export default function QuickReply({ options, onSelect }: QuickReplyProps) {
         <button
           key={opt}
           onClick={() => onSelect(opt)}
-          className="rounded-full border-[1.5px] border-owl-orange text-owl-orange bg-cream-card px-4 py-2 text-sm hover:bg-owl-orange hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60 min-h-[44px]"
+          className="rounded-full border-[1.5px] border-owl-orange text-owl-orange-dark bg-cream-card px-4 py-2 text-sm hover:bg-owl-orange hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark min-h-[44px]"
         >
           {opt}
         </button>

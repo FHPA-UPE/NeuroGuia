@@ -27,7 +27,7 @@ export function EmotionControls({ visible, avatarState, movement, onStateChange,
   return (
     <div className="flex-shrink-0 border-y border-mist px-4 py-2 flex flex-col gap-1.5 w-full">
       <div className="flex items-center gap-2">
-        <span className="flex-shrink-0 text-[10px] font-bold text-slate-text/60 uppercase tracking-widest w-12">
+        <span className="flex-shrink-0 text-[10px] font-bold text-slate-text uppercase tracking-widest w-12">
           Emoção
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -38,7 +38,7 @@ export function EmotionControls({ visible, avatarState, movement, onStateChange,
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors min-h-[28px] ${
                 avatarState === value
                   ? 'bg-owl-orange text-white border-owl-orange'
-                  : 'text-owl-orange/80 border-owl-orange/30 hover:border-owl-orange/60 bg-owl-orange-soft/50'
+                  : 'text-owl-orange-dark border-owl-orange/30 hover:border-owl-orange bg-owl-orange-soft/50'
               }`}
             >
               {label}
@@ -47,7 +47,7 @@ export function EmotionControls({ visible, avatarState, movement, onStateChange,
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <span className="flex-shrink-0 text-[10px] font-bold text-slate-text/60 uppercase tracking-widest w-12">
+        <span className="flex-shrink-0 text-[10px] font-bold text-slate-text uppercase tracking-widest w-12">
           Mov.
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -58,7 +58,7 @@ export function EmotionControls({ visible, avatarState, movement, onStateChange,
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors min-h-[28px] ${
                 movement === value
                   ? 'bg-violet text-white border-violet'
-                  : 'text-violet/80 border-violet/30 hover:border-violet/60 bg-violet-soft/50'
+                  : 'text-violet-dark border-violet/30 hover:border-violet bg-violet-soft/50'
               }`}
             >
               {label}

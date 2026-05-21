@@ -29,7 +29,7 @@ export function LgpdModal({ onAccept, onDecline }: Props) {
         </button>
         <button
           onClick={onAccept}
-          className="rounded-xl px-4 py-2.5 bg-owl-orange hover:bg-owl-orange-dark text-white transition-colors min-h-[44px] font-semibold"
+          className="rounded-xl px-4 py-2.5 bg-owl-orange hover:bg-owl-orange-dark text-ink transition-colors min-h-[44px] font-semibold"
         >
           Entendi e aceito
         </button>

@@ -27,7 +27,7 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
     <header className="sticky top-0 z-50 h-16 bg-cream-card border-b border-mist shadow-sm flex items-center px-4 gap-3">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-owl-orange text-white px-4 py-2 rounded-btn z-50"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-owl-orange text-ink px-4 py-2 rounded-btn z-50"
       >
         Ir para o conteúdo
       </a>
@@ -64,7 +64,7 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
         ) : (
           <Link
             href="/chat"
-            className="flex items-center gap-1 text-owl-orange font-semibold hover:text-owl-orange-dark"
+            className="flex items-center gap-1 text-owl-orange-dark font-semibold hover:text-ink"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

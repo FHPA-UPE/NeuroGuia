@@ -32,14 +32,14 @@ body {
 }
 
 *:focus-visible {
-  outline: 3px solid var(--color-owl-orange);
+  outline: 3px solid var(--color-owl-orange-dark);
   outline-offset: 3px;
 }
 
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(245, 130, 13, 0.25);
+  background: #D96A00;
   border-radius: 2px;
 }
 
