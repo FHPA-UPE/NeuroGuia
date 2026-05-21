@@ -1,10 +1,10 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useChat } from '@/hooks/useChat'
 import { useSpeech } from '@/hooks/useSpeech'
+import { AppHeader } from '@/components/AppHeader'
 import { OwlAvatar } from '@/components/OwlAvatar'
 import { ChatBubble } from '@/components/ChatBubble'
 import { ChatInput } from '@/components/ChatInput'
@@ -12,8 +12,17 @@ import { EmotionControls } from '@/components/EmotionControls'
 import { LgpdModal } from '@/components/LgpdModal'
 import QuickReply from '@/components/QuickReply/QuickReply'
 import { SessionRatingToast } from '@/components/SessionRatingToast'
+import type { AvatarState } from '@/types/chat'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+
+const STAGE_COLORS: Record<AvatarState, string> = {
+  neutral:     '#FEF0E0',
+  happy:       '#FEF0E0',
+  encouraging: '#EDE8F8',
+  empathetic:  '#EDE8F8',
+  thoughtful:  '#E4E0F0',
+}
 
 export default function ChatPage() {
   const { user, logout } = useAuth()
@@ -43,10 +52,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     function onBeforeUnload(e: BeforeUnloadEvent) {
-      if (messages.length > 0) {
-        setShowRating(true)
-        e.preventDefault()
-      }
+      if (messages.length > 0) { setShowRating(true); e.preventDefault() }
     }
     window.addEventListener('beforeunload', onBeforeUnload)
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
@@ -54,8 +60,7 @@ export default function ChatPage() {
 
   function handleToggleListen() {
     if (!lgpdAccepted) { setShowLgpdModal(true); return }
-    if (isListening) stopListening()
-    else startListening()
+    if (isListening) stopListening(); else startListening()
   }
 
   function handleToggleSpeak() {
@@ -63,18 +68,15 @@ export default function ChatPage() {
     setAudioEnabled(a => !a)
   }
 
-  function handleSend(text: string) {
-    cancel()
-    sendMessage(text)
-  }
+  function handleSend(text: string) { cancel(); sendMessage(text) }
 
   function handleFeedback(messageId: string, rating: 'up' | 'down') {
     const msg = messages.find(m => m.id === messageId)
     if (!msg) return
-    const token = sessionStorage.getItem('access_token') ?? ''
+    const tok = sessionStorage.getItem('access_token') ?? ''
     fetch(`${API}/feedback`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },
       body: JSON.stringify({
         type: 'message', message_id: messageId,
         question: messages.at(-2)?.content ?? '',
@@ -94,44 +96,23 @@ export default function ChatPage() {
   }
 
   function handleLogout() {
-    if (messages.length > 0) {
-      setShowRating(true)
-      return
-    }
+    if (messages.length > 0) { setShowRating(true); return }
     document.cookie = 'access_token=; path=/; max-age=0'
     logout()
     router.push('/login')
   }
 
-  const isAdmin = user?.role && ['admin_ppgec', 'admin'].includes(user.role)
-
   return (
     <>
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-calm-indigo text-white px-4 py-2 rounded-btn z-50">
-        Ir para o conteúdo
-      </a>
+      <AppHeader onLogout={handleLogout} />
 
-      <div className="flex flex-col h-screen bg-ice-white">
-        {/* Header */}
-        <header className="bg-pure-white border-b border-mist px-4 py-3 flex items-center justify-between">
-          <h1 className="font-bold text-midnight text-lg">NeuroGuia</h1>
-          <nav className="flex items-center gap-4 text-sm">
-            {isAdmin && (
-              <>
-                <Link href="/ingest" className="text-calm-indigo hover:underline">Base de Conhecimento</Link>
-                <Link href="/feedback" className="text-calm-indigo hover:underline">Feedback</Link>
-              </>
-            )}
-            {user?.role === 'admin' && (
-              <Link href="/config" className="text-calm-indigo hover:underline">Configurações</Link>
-            )}
-            <button onClick={handleLogout} className="text-slate-text hover:text-midnight">Sair</button>
-          </nav>
-        </header>
-
-        {/* Avatar area */}
-        <div className="flex flex-col items-center pt-4 pb-2 shrink-0">
-          <OwlAvatar state={avatarState} movement={movement} beakOpen={beakOpen} />
+      <div className="flex flex-col h-[calc(100vh-64px)] bg-cream">
+        {/* Zona de palco OWL */}
+        <div
+          className="flex flex-col items-center pt-5 pb-3 shrink-0"
+          style={{ backgroundColor: STAGE_COLORS[avatarState], transition: 'background-color 0.4s ease' }}
+        >
+          <OwlAvatar state={avatarState} movement={movement} beakOpen={beakOpen} aria-label={`OWL assistente, expressão: ${avatarState}`} />
           <EmotionControls
             visible={user?.role === 'admin'}
             avatarState={avatarState}
@@ -139,37 +120,44 @@ export default function ChatPage() {
             onStateChange={setAvatarState}
             onMovementChange={setMovement}
           />
-          {quickReplies.length > 0 && (
-            <QuickReply options={quickReplies} onSelect={handleSend} />
-          )}
         </div>
 
-        {/* Messages */}
-        <main id="main-content" className="flex-1 overflow-y-auto px-4 py-2" aria-live="polite" aria-label="Conversa com OWL">
+        {/* Mensagens */}
+        <main
+          id="main-content"
+          className="flex-1 overflow-y-auto px-4 py-4"
+          aria-live="polite"
+          aria-label="Conversa com OWL"
+        >
           {messages.map(msg => (
             <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} />
           ))}
           {isLoading && (
             <div aria-label="Carregando resposta" className="flex gap-1 p-3">
-              <span className="w-2 h-2 bg-silver rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-2 h-2 bg-silver rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-2 h-2 bg-silver rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           )}
           <div ref={messagesEndRef} />
         </main>
 
-        {/* Input */}
-        <ChatInput
-          onSend={handleSend}
-          disabled={isLoading}
-          isListening={isListening}
-          isSpeaking={isSpeaking || audioEnabled}
-          speechSupported={supported}
-          onToggleListen={handleToggleListen}
-          onToggleSpeak={handleToggleSpeak}
-          transcript={transcript}
-        />
+        {/* Quick replies + Input */}
+        <div className="shrink-0">
+          {quickReplies.length > 0 && (
+            <QuickReply options={quickReplies} onSelect={handleSend} />
+          )}
+          <ChatInput
+            onSend={handleSend}
+            disabled={isLoading}
+            isListening={isListening}
+            isSpeaking={isSpeaking || audioEnabled}
+            speechSupported={supported}
+            onToggleListen={handleToggleListen}
+            onToggleSpeak={handleToggleSpeak}
+            transcript={transcript}
+          />
+        </div>
       </div>
 
       {showLgpdModal && (
@@ -178,11 +166,20 @@ export default function ChatPage() {
           onDecline={() => setShowLgpdModal(false)}
         />
       )}
-
       {showRating && (
         <SessionRatingToast
-          onRate={emoji => { submitSessionRating(emoji); document.cookie = 'access_token=; path=/; max-age=0'; logout(); router.push('/login') }}
-          onDismiss={() => { setShowRating(false); document.cookie = 'access_token=; path=/; max-age=0'; logout(); router.push('/login') }}
+          onRate={emoji => {
+            submitSessionRating(emoji)
+            document.cookie = 'access_token=; path=/; max-age=0'
+            logout()
+            router.push('/login')
+          }}
+          onDismiss={() => {
+            setShowRating(false)
+            document.cookie = 'access_token=; path=/; max-age=0'
+            logout()
+            router.push('/login')
+          }}
         />
       )}
     </>

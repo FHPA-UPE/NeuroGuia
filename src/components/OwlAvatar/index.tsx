@@ -5,6 +5,7 @@ interface OwlAvatarProps {
   state: AvatarState
   movement: Movement
   beakOpen: boolean
+  'aria-label'?: string
 }
 
 const MOVEMENT_CLASS: Record<Movement, string> = {
@@ -43,7 +44,7 @@ const EXPRESSIONS: Record<AvatarState, {
   thoughtful:  { browLeft: 'M20,19 Q25,14 30,17', browRight: 'M50,17 Q55,14 60,19', beakPath: 'M35,45 Q40,48 45,45', pupilOffset: [-1,0], eyeRy: 8, headTilt: -3 },
 }
 
-export function OwlAvatar({ state, movement, beakOpen }: OwlAvatarProps) {
+export function OwlAvatar({ state, movement, beakOpen, 'aria-label': ariaLabel }: OwlAvatarProps) {
   const expr = EXPRESSIONS[state]
   const motionClass = MOVEMENT_CLASS[movement]
 
@@ -54,7 +55,7 @@ export function OwlAvatar({ state, movement, beakOpen }: OwlAvatarProps) {
     >
       <svg
         role="img"
-        aria-label={STATE_LABEL[state]}
+        aria-label={ariaLabel ?? STATE_LABEL[state]}
         viewBox="0 0 80 100"
         width="160"
         height="200"
