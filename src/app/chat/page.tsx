@@ -100,7 +100,7 @@ export default function ChatPage() {
       <AppHeader onLogout={handleLogout} />
 
       <div className="flex flex-col h-[calc(100vh-64px)] bg-cream">
-        {/* Zona de palco OWL */}
+        {/* Zona de palco OLLIE */}
         <div
           className="flex flex-col items-center pt-5 pb-3 shrink-0"
           style={{ backgroundColor: STAGE_COLORS[avatarState], transition: 'background-color 0.4s ease' }}
