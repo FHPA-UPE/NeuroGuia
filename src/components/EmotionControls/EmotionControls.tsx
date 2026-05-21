@@ -17,17 +17,17 @@ const STATES: { value: AvatarState; label: string }[] = [
 ]
 
 const MOVEMENTS: { value: Movement; label: string }[] = [
-  { value: 'idle',     label: 'Repouso' },
-  { value: 'talking',  label: 'Falando' },
-  { value: 'thinking', label: 'Pensando' },
+  { value: 'idle',    label: 'Repouso' },
+  { value: 'talking', label: 'Falando' },
+  { value: 'thinking',label: 'Pensando' },
 ]
 
 export function EmotionControls({ visible, avatarState, movement, onStateChange, onMovementChange }: EmotionControlsProps) {
   if (!visible) return null
   return (
-    <div className="flex-shrink-0 border-y border-[#2D5016]/10 px-4 py-2 flex flex-col gap-1.5">
+    <div className="flex-shrink-0 border-y border-mist px-4 py-2 flex flex-col gap-1.5 w-full">
       <div className="flex items-center gap-2">
-        <span className="flex-shrink-0 text-[10px] font-bold text-[#2D5016]/35 uppercase tracking-widest w-10">
+        <span className="flex-shrink-0 text-[10px] font-bold text-slate-text/60 uppercase tracking-widest w-12">
           Emoção
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -35,10 +35,10 @@ export function EmotionControls({ visible, avatarState, movement, onStateChange,
             <button
               key={value}
               onClick={() => onStateChange(value)}
-              className={`px-2.5 py-0.5 rounded-full text-xs border transition-colors ${
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors min-h-[28px] ${
                 avatarState === value
-                  ? 'bg-[#2D5016] text-white border-[#2D5016]'
-                  : 'text-[#2D5016]/55 border-[#2D5016]/20 hover:border-[#2D5016]/45'
+                  ? 'bg-owl-orange text-white border-owl-orange'
+                  : 'text-owl-orange/80 border-owl-orange/30 hover:border-owl-orange/60 bg-owl-orange-soft/50'
               }`}
             >
               {label}
@@ -46,9 +46,8 @@ export function EmotionControls({ visible, avatarState, movement, onStateChange,
           ))}
         </div>
       </div>
-
       <div className="flex items-center gap-2">
-        <span className="flex-shrink-0 text-[10px] font-bold text-[#C8860A]/45 uppercase tracking-widest w-10">
+        <span className="flex-shrink-0 text-[10px] font-bold text-slate-text/60 uppercase tracking-widest w-12">
           Mov.
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -56,10 +55,10 @@ export function EmotionControls({ visible, avatarState, movement, onStateChange,
             <button
               key={value}
               onClick={() => onMovementChange(value)}
-              className={`px-2.5 py-0.5 rounded-full text-xs border transition-colors ${
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors min-h-[28px] ${
                 movement === value
-                  ? 'bg-[#C8860A] text-white border-[#C8860A]'
-                  : 'text-[#C8860A]/55 border-[#C8860A]/20 hover:border-[#C8860A]/45'
+                  ? 'bg-violet text-white border-violet'
+                  : 'text-violet/80 border-violet/30 hover:border-violet/60 bg-violet-soft/50'
               }`}
             >
               {label}
