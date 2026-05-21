@@ -1,7 +1,9 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { OwlAvatar } from '@/components/OwlAvatar'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -28,11 +30,28 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-ice-white flex items-center justify-center p-4">
-      <div className="bg-pure-white rounded-card shadow p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-midnight mb-6 text-center">NeuroGuia</h1>
+    <main
+      className="min-h-screen flex flex-col items-center justify-center p-4"
+      style={{ background: 'linear-gradient(135deg, #FFFBF4 0%, #EDE8F8 100%)' }}
+    >
+      <div className="bg-cream-card rounded-3xl shadow-xl px-8 py-10 w-full max-w-sm">
+        <div className="flex flex-col items-center mb-6">
+          <Image
+            src="/ppgec-logo-circular.jpg"
+            alt="PPGEC UPE"
+            width={80}
+            height={80}
+            className="rounded-full mb-3"
+            priority
+          />
+          <h1 className="text-2xl font-bold text-ink text-center">NeuroGuia</h1>
+          <p className="text-sm text-slate-text text-center mt-1">
+            Assistente para estudantes do PPGEC · UPE
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm font-medium text-midnight">
+          <label className="flex flex-col gap-1 text-sm font-medium text-ink">
             Usuário
             <input
               type="text"
@@ -40,10 +59,10 @@ export default function LoginPage() {
               onChange={e => setUsername(e.target.value)}
               required
               autoComplete="username"
-              className="rounded-btn border border-mist px-4 py-2.5 text-base focus-visible:outline-calm-indigo bg-ice-white"
+              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm font-medium text-midnight">
+          <label className="flex flex-col gap-1 text-sm font-medium text-ink">
             Senha
             <input
               type="password"
@@ -51,20 +70,36 @@ export default function LoginPage() {
               onChange={e => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="rounded-btn border border-mist px-4 py-2.5 text-base focus-visible:outline-calm-indigo bg-ice-white"
+              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
             />
           </label>
+
           {error && (
-            <p role="alert" className="text-crimson text-sm">{error}</p>
+            <p role="alert" className="flex items-center gap-2 text-sm text-ink bg-error/10 rounded-xl px-4 py-2.5 border border-error/30">
+              <span aria-hidden="true">⚠️</span> {error}
+            </p>
           )}
+
           <button
             type="submit"
             disabled={loading}
-            className="bg-calm-indigo hover:bg-deep-indigo text-white rounded-btn py-2.5 px-5 font-semibold disabled:opacity-60 transition-colors"
+            className="bg-owl-orange hover:bg-owl-orange-dark text-white rounded-2xl py-3.5 px-5 font-semibold disabled:opacity-60 transition-colors min-h-[48px] flex items-center justify-center gap-2"
           >
-            {loading ? 'Entrando…' : 'Entrar'}
+            {loading ? (
+              <>
+                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+                </svg>
+                Entrando…
+              </>
+            ) : 'Entrar →'}
           </button>
         </form>
+      </div>
+
+      <div className="mt-4 pointer-events-none" aria-hidden="true">
+        <OwlAvatar state="neutral" movement="idle" beakOpen={false} aria-label="OWL assistente decorativo" />
       </div>
     </main>
   )
