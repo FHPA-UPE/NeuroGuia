@@ -1,23 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --color-ice-white: #F4F6FB;
-  --color-pure-white: #FFFFFF;
-  --color-frost: #EEF1F8;
-  --color-mist: #DDE2EE;
-  --color-calm-indigo: #4A5BE0;
-  --color-deep-indigo: #3A4BC8;
-  --color-soft-indigo: #EEF0FC;
-  --color-warm-terracotta: #D95F3B;
-  --color-deep-terracotta: #C04E2C;
-  --color-blush: #FBF0EC;
-  --color-midnight: #1C1E2E;
-  --color-slate: #5A5F7A;
-  --color-silver: #6D7A99;
-  --color-forest-green: #1A7F5A;
-  --color-amber: #D4880A;
-  --color-crimson: #C0392B;
-  --color-ocean-blue: #2E6DB4;
+  --color-owl-orange:      #F5820D;
+  --color-owl-orange-dark: #D96A00;
+  --color-owl-orange-soft: #FEF0E0;
+  --color-violet:          #7C5CBF;
+  --color-violet-dark:     #614A99;
+  --color-violet-soft:     #EDE8F8;
+  --color-cream:           #FFFBF4;
+  --color-cream-card:      #FFFFFF;
+  --color-ink:             #1C1A2E;
+  --color-slate-text:      #5A567A;
+  --color-mist:            #E4E0F0;
+  --color-error:           #C0392B;
+  --color-success:         #1A7F5A;
 }
 
 * {
@@ -28,82 +24,40 @@
 
 body {
   font-family: var(--font-atkinson), 'Atkinson Hyperlegible', sans-serif;
-  background-color: var(--color-ice-white);
-  color: var(--color-midnight);
-  font-size: 16px;
-  line-height: 1.65;
-  letter-spacing: 0.01em;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-size: 17px;
+  line-height: 1.75;
+  letter-spacing: 0.02em;
 }
 
 *:focus-visible {
-  outline: 3px solid var(--color-calm-indigo);
+  outline: 3px solid var(--color-owl-orange);
   outline-offset: 3px;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 3px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(26, 127, 90, 0.2);
+  background: rgba(245, 130, 13, 0.25);
   border-radius: 2px;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .ollie-avatar svg {
-    animation: none !important;
-  }
+  .owl-idle, .owl-talking, .owl-thinking, .owl-talk,
+  .owl-state-happy #owl-hat, .owl-state-happy #owl-hat-tassel,
+  .owl-state-thoughtful #owl-hat-tassel { animation: none; }
 }
 
-/* OLLIE Avatar Animations */
-@keyframes ollie-bob {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
-}
-
-@keyframes ollie-talk {
-  0%, 100% { transform: scaleY(1); transform-origin: top center; }
-  50%       { transform: scaleY(1.6); transform-origin: top center; }
-}
-
-@keyframes ollie-think {
-  0%, 100% { transform: rotate(0deg); transform-origin: bottom center; }
-  40%       { transform: rotate(-10deg); transform-origin: bottom center; }
-  60%       { transform: rotate(10deg); transform-origin: bottom center; }
-}
-
-.ollie-idle     { animation: ollie-bob   3s ease-in-out infinite; }
-.ollie-talking  { animation: ollie-bob   3s ease-in-out infinite; }
-.ollie-thinking { animation: ollie-think 2s ease-in-out infinite; }
-
-.ollie-beak-bottom {
-  transform-box: fill-box;
-}
-
-.ollie-talking .ollie-beak-bottom {
-  animation: ollie-talk 0.35s ease-in-out infinite;
-}
-
-/* OWL animations */
 @keyframes owl-idle-bob {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-4px); }
@@ -137,19 +91,11 @@ body {
   50% { transform: rotate(25deg); }
 }
 
-.owl-idle { animation: owl-idle-bob 3s ease-in-out infinite; }
-.owl-talking { animation: owl-talk-bob 0.4s ease-in-out infinite; }
-.owl-thinking { animation: owl-think-spin 3s ease-in-out infinite; }
+.owl-idle    { animation: owl-idle-bob   3s ease-in-out infinite; }
+.owl-talking { animation: owl-talk-bob   0.4s ease-in-out infinite; }
+.owl-thinking{ animation: owl-think-spin 3s ease-in-out infinite; }
+.owl-talk    { animation: owl-talk-beak  0.24s ease-in-out; }
 
-.owl-talk { animation: owl-talk-beak 0.24s ease-in-out; }
-
-/* Hat animations per avatar_state */
-.owl-state-happy #owl-hat { animation: owl-hat-happy-bounce 0.5s ease-out forwards; }
-.owl-state-happy #owl-hat-tassel { animation: owl-tassel-sway 0.6s ease-in-out 0.1s; }
+.owl-state-happy    #owl-hat        { animation: owl-hat-happy-bounce 0.5s ease-out forwards; }
+.owl-state-happy    #owl-hat-tassel { animation: owl-tassel-sway 0.6s ease-in-out 0.1s; }
 .owl-state-thoughtful #owl-hat-tassel { animation: owl-tassel-pendulum 1.5s ease-in-out infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .owl-idle, .owl-talking, .owl-thinking, .owl-talk,
-  .owl-state-happy #owl-hat, .owl-state-happy #owl-hat-tassel,
-  .owl-state-thoughtful #owl-hat-tassel { animation: none; }
-}
