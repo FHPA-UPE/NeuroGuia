@@ -10,6 +10,20 @@
 
 **Spec:** `docs/superpowers/specs/2026-05-20-redesign-visual-acessibilidade-design.md`
 
+**Revisão de acessibilidade:** Realizada por agente especializado. Correções incorporadas abaixo (marcadas com 🔴/🟡).
+
+### Correções de acessibilidade incorporadas ao plano
+
+| # | Problema | Correção | Task |
+|---|---|---|---|
+| 🔴 | Avatar SVG sem `aria-label` | Adicionar `aria-label` ao SVG do OwlAvatar | Task 4 |
+| 🔴 | Quick reply altura ~20px (< 44px) | Adicionar `min-h-[44px]` nos chips | Task 7 |
+| 🔴 | `text-error` sobre `error/10` fundo — contraste < 2:1 | Usar `text-ink` em mensagens de erro | Tasks 3, 9, 11 |
+| 🟡 | Focus ring `ring-owl-orange/30` transparente | Mudar para `ring-owl-orange/60` | Tasks 3, 6, 11 |
+| 🟡 | Botões 👍👎 ocultos até hover | Tornar sempre visíveis (remover `opacity-0`) | Task 5 |
+| 🟡 | Sem confirmação para "Remover documento" | Adicionar `confirm()` antes do delete | Task 9 |
+| 🔴 | `owl-orange #F5820D` ratio 2.91:1 < 3:1 para ícones | Usar `owl-orange-dark #D96A00` para texto; `owl-orange` apenas decorativo | Task 1 (nota) |
+
 ---
 
 ### Task 1: Paleta de cores e tipografia
@@ -458,7 +472,7 @@ export default function LoginPage() {
               onChange={e => setUsername(e.target.value)}
               required
               autoComplete="username"
-              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/30"
+              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm font-medium text-ink">
@@ -469,12 +483,12 @@ export default function LoginPage() {
               onChange={e => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/30"
+              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
             />
           </label>
 
           {error && (
-            <p role="alert" className="flex items-center gap-2 text-sm text-error bg-error/10 rounded-xl px-4 py-2.5">
+            <p role="alert" className="flex items-center gap-2 text-sm text-ink bg-error/10 rounded-xl px-4 py-2.5 border border-error/30">
               <span aria-hidden="true">⚠️</span> {error}
             </p>
           )}
@@ -498,7 +512,7 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-4 pointer-events-none" aria-hidden="true">
-        <OwlAvatar state="neutral" movement="idle" beakOpen={false} />
+        <OwlAvatar state="neutral" movement="idle" beakOpen={false} aria-label="OWL assistente decorativo" />
       </div>
     </main>
   )
@@ -526,6 +540,7 @@ git commit -m "feat(design): redesign tela de login com card, logo PPGEC e OWL"
 
 **Files:**
 - Modify: `src/app/chat/page.tsx`
+- Modify: `src/components/OwlAvatar/index.tsx` — adicionar `aria-label?: string` à interface `OwlAvatarProps` e aplicar no SVG raiz
 
 - [ ] **Step 1: Reescrever `src/app/chat/page.tsx`**
 
@@ -644,7 +659,7 @@ export default function ChatPage() {
           className="flex flex-col items-center pt-5 pb-3 shrink-0"
           style={{ backgroundColor: STAGE_COLORS[avatarState], transition: 'background-color 0.4s ease' }}
         >
-          <OwlAvatar state={avatarState} movement={movement} beakOpen={beakOpen} />
+          <OwlAvatar state={avatarState} movement={movement} beakOpen={beakOpen} aria-label={`OWL assistente, expressão: ${avatarState}`} />
           <EmotionControls
             visible={user?.role === 'admin'}
             avatarState={avatarState}
@@ -768,9 +783,10 @@ export function ChatBubble({ message, onFeedback }: Props) {
   const sourceCount = message.sources?.length ?? 0
 
   return (
-    <div className={`group flex ${isAssistant ? 'justify-start' : 'justify-end'} mb-4`}>
-      <div
-        className={`max-w-[80%] rounded-2xl px-5 py-4 text-base leading-relaxed ${
+    <div className={`flex ${isAssistant ? 'justify-start' : 'justify-end'} mb-4`}>
+      <article
+        aria-label={`Mensagem de ${isAssistant ? 'OWL' : 'você'}`}
+        className={`max-w-[80%] rounded-2xl px-5 py-4 text-base leading-relaxed group ${
           isAssistant
             ? 'bg-owl-orange-soft border-l-4 border-owl-orange rounded-tl-sm'
             : 'bg-violet-soft border-r-4 border-violet rounded-tr-sm'
@@ -796,24 +812,24 @@ export function ChatBubble({ message, onFeedback }: Props) {
         )}
 
         {isAssistant && (
-          <div className="flex gap-2 mt-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+          <div className="flex gap-2 mt-2">
             <button
               aria-label="Resposta útil"
               onClick={() => onFeedback(message.id, 'up')}
-              className="text-lg hover:scale-110 transition-transform min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="text-lg hover:scale-110 transition-transform min-h-[44px] min-w-[44px] flex items-center justify-center opacity-60 hover:opacity-100"
             >
               👍
             </button>
             <button
               aria-label="Resposta não útil"
               onClick={() => onFeedback(message.id, 'down')}
-              className="text-lg hover:scale-110 transition-transform min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="text-lg hover:scale-110 transition-transform min-h-[44px] min-w-[44px] flex items-center justify-center opacity-60 hover:opacity-100"
             >
               👎
             </button>
           </div>
         )}
-      </div>
+      </article>
     </div>
   )
 }
@@ -909,7 +925,7 @@ export function ChatInput({
         onChange={e => setText(e.target.value)}
         placeholder="Digite ou fale sua dúvida…"
         disabled={disabled}
-        className="flex-1 rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] placeholder:text-slate-text/60 disabled:opacity-60 focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/30"
+        className="flex-1 rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] placeholder:text-slate-text/60 disabled:opacity-60 focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
         aria-label="Mensagem para o OWL"
       />
 
@@ -988,7 +1004,7 @@ export default function QuickReply({ options, onSelect }: QuickReplyProps) {
         <button
           key={opt}
           onClick={() => onSelect(opt)}
-          className="rounded-full border-[1.5px] border-owl-orange text-owl-orange bg-cream-card px-4 py-1.5 text-sm hover:bg-owl-orange hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/50 min-h-[36px]"
+          className="rounded-full border-[1.5px] border-owl-orange text-owl-orange bg-cream-card px-4 py-2 text-sm hover:bg-owl-orange hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60 min-h-[44px]"
         >
           {opt}
         </button>
@@ -1276,7 +1292,8 @@ export default function IngestPage() {
     setIngesting(false); loadDocs()
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, name: string) {
+    if (!confirm(`Remover "${name}" da base de conhecimento?`)) return
     await fetch(`${API}/docs/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } })
     loadDocs()
   }
@@ -1308,7 +1325,7 @@ export default function IngestPage() {
             />
           </div>
           {error && (
-            <p role="alert" className="flex items-center gap-2 text-sm text-error bg-error/10 rounded-xl px-4 py-2.5 mt-2">
+            <p role="alert" className="flex items-center gap-2 text-sm text-ink bg-error/10 rounded-xl px-4 py-2.5 mt-2 border border-error/30">
               <span aria-hidden="true">⚠️</span> {error}
             </p>
           )}
@@ -1348,7 +1365,7 @@ export default function IngestPage() {
                       <span aria-hidden="true">📄</span> {doc.source}
                     </span>
                     <button
-                      onClick={() => handleDelete(doc.source_id)}
+                      onClick={() => handleDelete(doc.source_id, doc.source)}
                       aria-label={`Remover ${doc.source}`}
                       className="text-error hover:text-red-700 font-bold text-lg leading-none min-w-[44px] min-h-[44px] flex items-center justify-center"
                     >
@@ -1561,7 +1578,7 @@ export default function ConfigPage() {
     if (res.ok) setSaved(true); else setError('Erro ao salvar')
   }
 
-  const fieldClass = 'rounded-xl border border-mist px-4 py-3 bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/30'
+  const fieldClass = 'rounded-xl border border-mist px-4 py-3 bg-cream min-h-[48px] focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60'
 
   return (
     <>
@@ -1577,7 +1594,7 @@ export default function ConfigPage() {
                 rows={10}
                 value={cfg.system_prompt}
                 onChange={e => setCfg(c => ({ ...c, system_prompt: e.target.value }))}
-                className="rounded-2xl border border-mist px-5 py-3.5 text-sm bg-cream font-mono focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/30"
+                className="rounded-2xl border border-mist px-5 py-3.5 text-sm bg-cream font-mono focus-visible:border-owl-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange/60"
               />
             </label>
           </div>
@@ -1633,7 +1650,7 @@ export default function ConfigPage() {
           </div>
 
           {error && (
-            <p role="alert" className="flex items-center gap-2 text-sm text-error bg-error/10 rounded-xl px-4 py-2.5">
+            <p role="alert" className="flex items-center gap-2 text-sm text-ink bg-error/10 rounded-xl px-4 py-2.5 border border-error/30">
               <span aria-hidden="true">⚠️</span> {error}
             </p>
           )}
