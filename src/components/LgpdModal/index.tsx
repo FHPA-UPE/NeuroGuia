@@ -8,31 +8,28 @@ interface Props {
 
 export function LgpdModal({ onAccept, onDecline }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
-
-  useEffect(() => {
-    dialogRef.current?.showModal()
-  }, [])
+  useEffect(() => { dialogRef.current?.showModal() }, [])
 
   return (
     <dialog
       ref={dialogRef}
-      className="rounded-card p-6 max-w-sm w-full bg-pure-white shadow-lg"
+      className="rounded-2xl p-6 max-w-sm w-full bg-cream-card shadow-xl border border-mist"
       aria-labelledby="lgpd-title"
     >
-      <h2 id="lgpd-title" className="text-lg font-bold text-midnight mb-3">Ativação de Microfone</h2>
-      <p className="text-sm text-slate-text mb-4">
+      <h2 id="lgpd-title" className="text-lg font-bold text-ink mb-3">Ativação de Microfone</h2>
+      <p className="text-sm text-slate-text mb-4 leading-relaxed">
         O reconhecimento de voz usa a Web Speech API do Google. Seu áudio será enviado para servidores do Google para transcrição. Nenhum dado é armazenado pelo NeuroGuia.
       </p>
       <div className="flex gap-3 justify-end">
         <button
           onClick={onDecline}
-          className="rounded-btn px-4 py-2.5 border border-mist text-midnight hover:bg-frost transition-colors"
+          className="rounded-xl px-4 py-2.5 border border-mist text-ink hover:bg-mist/30 transition-colors min-h-[44px]"
         >
           Cancelar
         </button>
         <button
           onClick={onAccept}
-          className="rounded-btn px-4 py-2.5 bg-calm-indigo text-white hover:bg-deep-indigo transition-colors"
+          className="rounded-xl px-4 py-2.5 bg-owl-orange hover:bg-owl-orange-dark text-white transition-colors min-h-[44px] font-semibold"
         >
           Entendi e aceito
         </button>
