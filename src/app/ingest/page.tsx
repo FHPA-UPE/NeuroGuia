@@ -136,7 +136,7 @@ export default function IngestPage() {
                     <button
                       onClick={() => handleDelete(doc.source_id, doc.source)}
                       aria-label={`Remover ${doc.source}`}
-                      className="text-error hover:text-red-700 font-bold text-lg leading-none min-w-[44px] min-h-[44px] flex items-center justify-center"
+                      className="text-error hover:text-error font-bold text-lg leading-none min-w-[44px] min-h-[44px] flex items-center justify-center hover:opacity-80"
                     >
                       ×
                     </button>

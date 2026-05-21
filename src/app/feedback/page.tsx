@@ -28,8 +28,8 @@ export default function FeedbackPage() {
     URL.revokeObjectURL(url)
   }
 
-  if (error) return <><AppHeader /><main className="p-6 text-error">{error}</main></>
-  if (!data) return <><AppHeader /><main className="p-6 text-slate-text">Carregando…</main></>
+  if (error) return <><AppHeader /><main id="main-content" className="p-6 text-error">{error}</main></>
+  if (!data) return <><AppHeader /><main id="main-content" className="p-6 text-slate-text">Carregando…</main></>
 
   const emojiCount = { happy: 0, neutral: 0, sad: 0 }
   for (const s of data.sessions) emojiCount[s.emoji as keyof typeof emojiCount]++

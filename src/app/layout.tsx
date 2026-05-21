@@ -9,8 +9,8 @@ const atkinson = Atkinson_Hyperlegible({
 });
 
 export const metadata: Metadata = {
-  title: "NeuroGuia | OLLIE",
-  description: "Assistente de suporte emocional para pessoas neurodivergentes",
+  title: "NeuroGuia | OWL",
+  description: "Assistente educacional para estudantes do PPGEC · UPE",
 };
 
 export default function RootLayout({
