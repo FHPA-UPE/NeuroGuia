@@ -7,3 +7,4 @@ __pycache__/
 .pytest_cache/
 .langchain_cache.db
 secrets.json
+secrets.lock
