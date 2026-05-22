@@ -6,3 +6,4 @@ __pycache__/
 *.pyo
 .pytest_cache/
 .langchain_cache.db
+secrets.json

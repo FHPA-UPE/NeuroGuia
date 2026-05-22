@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 import auth as auth_module
 from providers import mask_key
-from services import config_service
+from services import config_service, secret_service
 
 router = APIRouter(prefix="/config", tags=["config"])
 security = HTTPBearer(auto_error=False)
@@ -30,6 +30,9 @@ class ConfigUpdate(BaseModel):
     llm_model: str
     embed_provider: str
     embed_model: str
+    anthropic_api_key: str | None = None
+    openai_api_key: str | None = None
+    google_api_key: str | None = None
 
 
 @router.get("")
@@ -37,15 +40,22 @@ async def get_config(user: dict = Depends(_require_admin)):
     cfg = config_service.read_config()
     return {
         **cfg,
-        "anthropic_api_key": mask_key(os.getenv("ANTHROPIC_API_KEY", "")),
-        "openai_api_key": mask_key(os.getenv("OPENAI_API_KEY", "")),
-        "google_api_key": mask_key(os.getenv("GOOGLE_API_KEY", "")),
+        "anthropic_api_key": mask_key(secret_service.get_key("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY", "")),
+        "openai_api_key": mask_key(secret_service.get_key("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY", "")),
+        "google_api_key": mask_key(secret_service.get_key("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY", "")),
     }
 
 
 @router.put("")
 async def put_config(body: ConfigUpdate, user: dict = Depends(_require_admin)):
     cfg = config_service.read_config()
-    cfg.update(body.model_dump())
+    # apenas os campos que vão para config.json (excluindo chaves de API)
+    cfg.update(body.model_dump(exclude={'anthropic_api_key', 'openai_api_key', 'google_api_key'}))
     config_service.write_config(cfg)
+    # gravar chaves não-vazias em secrets.json
+    secret_service.set_keys({
+        'ANTHROPIC_API_KEY': body.anthropic_api_key or '',
+        'OPENAI_API_KEY': body.openai_api_key or '',
+        'GOOGLE_API_KEY': body.google_api_key or '',
+    })
     return {"status": "saved"}
