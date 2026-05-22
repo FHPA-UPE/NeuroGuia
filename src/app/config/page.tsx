@@ -10,8 +10,8 @@ export default function ConfigPage() {
   const [cfg, setCfg] = useState({
     system_prompt: '', llm_provider: 'anthropic', llm_model: '',
     embed_provider: 'openai', embed_model: '',
-    anthropic_api_key: '', openai_api_key: '', google_api_key: '',
   })
+  const [apiKeys, setApiKeys] = useState({ anthropic: '', openai: '', google: '' })
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
 
@@ -29,9 +29,12 @@ export default function ConfigPage() {
         system_prompt: cfg.system_prompt,
         llm_provider: cfg.llm_provider, llm_model: cfg.llm_model,
         embed_provider: cfg.embed_provider, embed_model: cfg.embed_model,
+        ...(apiKeys.anthropic && { anthropic_api_key: apiKeys.anthropic }),
+        ...(apiKeys.openai && { openai_api_key: apiKeys.openai }),
+        ...(apiKeys.google && { google_api_key: apiKeys.google }),
       }),
     })
-    if (res.ok) setSaved(true); else setError('Erro ao salvar')
+    if (res.ok) { setSaved(true); setApiKeys({ anthropic: '', openai: '', google: '' }) } else setError('Erro ao salvar')
   }
 
   const fieldClass = 'rounded-xl border border-mist px-4 py-3 bg-cream min-h-[48px] focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark'
@@ -96,13 +99,26 @@ export default function ConfigPage() {
           </div>
 
           <div className="bg-violet-soft rounded-2xl border border-violet/20 p-5">
-            <p className="text-sm font-semibold text-ink mb-2 flex items-center gap-2">
-              <span aria-hidden="true">🔒</span> Chaves de API (somente leitura)
-            </p>
-            {[['Anthropic', cfg.anthropic_api_key], ['OpenAI', cfg.openai_api_key], ['Google', cfg.google_api_key]].map(([name, val]) => (
-              <p key={name} className="text-sm text-slate-text">{name}: <code className="font-mono text-xs">{val || '—'}</code></p>
-            ))}
-            <p className="text-xs text-slate-text mt-1">Para alterar chaves, edite o arquivo backend/.env</p>
+            <p className="text-sm font-semibold text-ink mb-4 flex items-center gap-2"><span aria-hidden="true">🔒</span> Chaves de API</p>
+            <div className="flex flex-col gap-3">
+              {[
+                { label: 'Anthropic API Key', key: 'anthropic' as const },
+                { label: 'OpenAI API Key', key: 'openai' as const },
+                { label: 'Google API Key', key: 'google' as const },
+              ].map(({ label, key }) => (
+                <label key={key} className="flex flex-col gap-1 text-sm font-medium text-ink">
+                  {label}
+                  <input
+                    type="password"
+                    value={apiKeys[key]}
+                    onChange={e => setApiKeys(k => ({ ...k, [key]: e.target.value }))}
+                    placeholder="sk-... (deixe vazio para não alterar)"
+                    autoComplete="new-password"
+                    className={fieldClass}
+                  />
+                </label>
+              ))}
+            </div>
           </div>
 
           {error && (
