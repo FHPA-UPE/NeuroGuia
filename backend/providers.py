@@ -32,12 +32,7 @@ async def call_llm_stream(messages: list[dict]):
     provider = cfg.get("llm_provider", "anthropic")
     model = cfg.get("llm_model", "claude-haiku-4-5-20251001")
     litellm_model = f"{provider}/{model}"
-
-    # inject secret keys into env for litellm
-    for name in ('ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'GOOGLE_API_KEY'):
-        val = secret_service.get_key(name)
-        if val:
-            os.environ[name] = val
+    api_key = _get_key(f'{provider.upper()}_API_KEY')
 
     response = await litellm.acompletion(
         model=litellm_model,
@@ -45,6 +40,7 @@ async def call_llm_stream(messages: list[dict]):
         temperature=0.3,
         timeout=30,
         stream=True,
+        **({"api_key": api_key} if api_key else {}),
     )
     async for chunk in response:
         delta = chunk.choices[0].delta
