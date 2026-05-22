@@ -6,8 +6,16 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 const PROVIDERS = ['anthropic', 'openai', 'google'] as const
 function token() { return sessionStorage.getItem('access_token') ?? '' }
 
+type CfgState = {
+  system_prompt: string
+  llm_provider: string
+  llm_model: string
+  embed_provider: string
+  embed_model: string
+}
+
 export default function ConfigPage() {
-  const [cfg, setCfg] = useState({
+  const [cfg, setCfg] = useState<CfgState>({
     system_prompt: '', llm_provider: 'anthropic', llm_model: '',
     embed_provider: 'openai', embed_model: '',
   })
@@ -17,7 +25,11 @@ export default function ConfigPage() {
 
   useEffect(() => {
     fetch(`${API}/config`, { headers: { Authorization: `Bearer ${token()}` } })
-      .then(r => r.json()).then(setCfg).catch(() => setError('Erro ao carregar configurações'))
+      .then(r => r.json())
+      .then(({ system_prompt, llm_provider, llm_model, embed_provider, embed_model }) =>
+        setCfg({ system_prompt, llm_provider, llm_model, embed_provider, embed_model })
+      )
+      .catch(() => setError('Erro ao carregar configurações'))
   }, [])
 
   async function handleSave(e: React.FormEvent) {
@@ -106,9 +118,10 @@ export default function ConfigPage() {
                 { label: 'OpenAI API Key', key: 'openai' as const },
                 { label: 'Google API Key', key: 'google' as const },
               ].map(({ label, key }) => (
-                <label key={key} className="flex flex-col gap-1 text-sm font-medium text-ink">
+                <label key={key} htmlFor={`api-key-${key}`} className="flex flex-col gap-1 text-sm font-medium text-ink">
                   {label}
                   <input
+                    id={`api-key-${key}`}
                     type="password"
                     value={apiKeys[key]}
                     onChange={e => setApiKeys(k => ({ ...k, [key]: e.target.value }))}
