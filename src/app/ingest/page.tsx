@@ -6,6 +6,58 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 interface Doc { source: string; source_id: string }
 function token() { return sessionStorage.getItem('access_token') ?? '' }
 
+interface DocItemProps {
+  doc: Doc
+  onDelete: (id: string, name: string) => Promise<void>
+}
+
+function DocItem({ doc, onDelete }: DocItemProps) {
+  const [confirming, setConfirming] = useState(false)
+
+  useEffect(() => {
+    if (!confirming) return
+    const t = setTimeout(() => setConfirming(false), 5000)
+    return () => clearTimeout(t)
+  }, [confirming])
+
+  return (
+    <li className="flex items-center justify-between bg-cream-card rounded-2xl border border-mist px-4 min-h-[52px]">
+      <span className="flex items-center gap-2 text-ink text-sm">
+        <span aria-hidden="true">📄</span> {doc.source}
+      </span>
+      {confirming ? (
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => { onDelete(doc.source_id, doc.source); setConfirming(false) }}
+            className="text-xs font-bold text-error hover:bg-error/10 rounded-lg px-2 py-1 min-h-[36px] transition-colors"
+          >
+            Confirmar
+          </button>
+          <button
+            onClick={() => setConfirming(false)}
+            className="text-xs text-slate-text hover:bg-mist rounded-lg px-2 py-1 min-h-[36px] transition-colors"
+          >
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setConfirming(true)}
+          aria-label={`Remover ${doc.source}`}
+          className="text-error hover:bg-error/10 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M19 6l-1 14H6L5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M9 6V4h6v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      )}
+    </li>
+  )
+}
+
 export default function IngestPage() {
   const [docs, setDocs] = useState<Doc[]>([])
   const [uploading, setUploading] = useState(false)
@@ -62,7 +114,6 @@ export default function IngestPage() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Remover "${name}" da base de conhecimento?`)) return
     await fetch(`${API}/docs/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } })
     loadDocs()
   }
@@ -129,18 +180,7 @@ export default function IngestPage() {
             : (
               <ul className="space-y-2">
                 {docs.map(doc => (
-                  <li key={doc.source_id} className="flex items-center justify-between bg-cream-card rounded-2xl border border-mist px-4 min-h-[52px]">
-                    <span className="flex items-center gap-2 text-ink text-sm">
-                      <span aria-hidden="true">📄</span> {doc.source}
-                    </span>
-                    <button
-                      onClick={() => handleDelete(doc.source_id, doc.source)}
-                      aria-label={`Remover ${doc.source}`}
-                      className="text-error hover:text-error font-bold text-lg leading-none min-w-[44px] min-h-[44px] flex items-center justify-center hover:opacity-80"
-                    >
-                      ×
-                    </button>
-                  </li>
+                  <DocItem key={doc.source_id} doc={doc} onDelete={handleDelete} />
                 ))}
               </ul>
             )
