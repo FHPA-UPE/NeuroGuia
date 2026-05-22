@@ -28,14 +28,16 @@ function DocItem({ doc, onDelete }: DocItemProps) {
       {confirming ? (
         <div className="flex items-center gap-1">
           <button
-            onClick={() => { onDelete(doc.source_id, doc.source); setConfirming(false) }}
-            className="text-xs font-bold text-error hover:bg-error/10 rounded-lg px-2 py-1 min-h-[36px] transition-colors"
+            aria-label={`Confirmar remoção de ${doc.source}`}
+            onClick={async () => { await onDelete(doc.source_id, doc.source); setConfirming(false) }}
+            className="text-xs font-bold text-error hover:bg-error/10 rounded-lg px-2 py-1 min-h-[44px] transition-colors"
           >
             Confirmar
           </button>
           <button
+            aria-label={`Cancelar remoção de ${doc.source}`}
             onClick={() => setConfirming(false)}
-            className="text-xs text-slate-text hover:bg-mist rounded-lg px-2 py-1 min-h-[36px] transition-colors"
+            className="text-xs text-slate-text hover:bg-mist rounded-lg px-2 py-1 min-h-[44px] transition-colors"
           >
             Cancelar
           </button>
