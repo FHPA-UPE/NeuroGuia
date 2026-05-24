@@ -31,9 +31,9 @@ function UserAvatarThumb() {
       data-testid="user-avatar-thumb"
       className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-violet/20 border-2 border-violet/30 flex items-center justify-center"
     >
-      <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
-        <circle cx="20" cy="14" r="7" fill="#7C5CBF" opacity="0.7" />
-        <ellipse cx="20" cy="34" rx="12" ry="9" fill="#7C5CBF" opacity="0.7" />
+      <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true" className="text-violet opacity-70">
+        <circle cx="20" cy="14" r="7" fill="currentColor" />
+        <ellipse cx="20" cy="34" rx="12" ry="9" fill="currentColor" />
       </svg>
     </div>
   )
