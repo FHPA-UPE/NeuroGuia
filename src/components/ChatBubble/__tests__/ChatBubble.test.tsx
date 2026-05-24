@@ -44,3 +44,35 @@ test('chama onFeedback com down ao clicar 👎', () => {
   fireEvent.click(screen.getByLabelText('Resposta não útil'))
   expect(onFeedback).toHaveBeenCalledWith('1', 'down')
 })
+
+test('bot message renders OllieAvatarThumb using message.avatar_state', () => {
+  render(<ChatBubble message={{ ...baseMsg, avatar_state: 'happy' }} onFeedback={() => {}} />)
+  expect(screen.getByRole('img', { name: /OLLIE está happy/i })).toBeInTheDocument()
+})
+
+test('bot message uses currentOllieState as fallback when message.avatar_state is undefined', () => {
+  const msg = { ...baseMsg, avatar_state: undefined }
+  render(<ChatBubble message={msg} onFeedback={() => {}} currentOllieState="encouraging" />)
+  expect(screen.getByRole('img', { name: /OLLIE está encouraging/i })).toBeInTheDocument()
+})
+
+test('bot message falls back to neutral when both avatar states are undefined', () => {
+  const msg = { ...baseMsg, avatar_state: undefined }
+  render(<ChatBubble message={msg} onFeedback={() => {}} />)
+  expect(screen.getByRole('img', { name: /OLLIE está neutral/i })).toBeInTheDocument()
+})
+
+test('user message renders UserAvatarThumb', () => {
+  render(<ChatBubble message={{ ...baseMsg, role: 'user' }} onFeedback={() => {}} />)
+  expect(screen.getByTestId('user-avatar-thumb')).toBeInTheDocument()
+})
+
+test('user message does not render OllieAvatarThumb', () => {
+  render(<ChatBubble message={{ ...baseMsg, role: 'user' }} onFeedback={() => {}} />)
+  expect(screen.queryByRole('img', { name: /OLLIE está/i })).toBeNull()
+})
+
+test('bot message does not render UserAvatarThumb', () => {
+  render(<ChatBubble message={baseMsg} onFeedback={() => {}} />)
+  expect(screen.queryByTestId('user-avatar-thumb')).toBeNull()
+})

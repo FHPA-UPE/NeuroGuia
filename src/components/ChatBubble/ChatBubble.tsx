@@ -1,20 +1,55 @@
 'use client'
 import { useState } from 'react'
-import type { ChatMessage } from '@/types/chat'
+import type { ChatMessage, AvatarState } from '@/types/chat'
+import OllieAvatar from '@/components/OllieAvatar/OllieAvatar'
 
 interface Props {
   message: ChatMessage
   onFeedback: (messageId: string, rating: 'up' | 'down') => void
+  currentOllieState?: AvatarState
 }
 
-export function ChatBubble({ message, onFeedback }: Props) {
+function OllieAvatarThumb({ state }: { state: AvatarState }) {
+  return (
+    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-owl-orange/30 relative">
+      <div style={{
+        position: 'absolute',
+        top: '35%',
+        left: '50%',
+        transform: 'translate(-50%, -50%) scale(0.208)',
+        transformOrigin: 'center center',
+      }}>
+        <OllieAvatar avatarState={state} movement="idle" />
+      </div>
+    </div>
+  )
+}
+
+function UserAvatarThumb() {
+  return (
+    <div
+      data-testid="user-avatar-thumb"
+      className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-violet/20 border-2 border-violet/30 flex items-center justify-center"
+    >
+      <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
+        <circle cx="20" cy="14" r="7" fill="#7C5CBF" opacity="0.7" />
+        <ellipse cx="20" cy="34" rx="12" ry="9" fill="#7C5CBF" opacity="0.7" />
+      </svg>
+    </div>
+  )
+}
+
+export function ChatBubble({ message, onFeedback, currentOllieState }: Props) {
   const [sourcesOpen, setSourcesOpen] = useState(false)
   const isAssistant = message.role === 'assistant'
   const hasSources = isAssistant && message.sources && message.sources.length > 0
   const sourceCount = message.sources?.length ?? 0
 
   return (
-    <div className={`flex ${isAssistant ? 'justify-start' : 'justify-end'} mb-4`}>
+    <div className={`flex items-end gap-2 ${isAssistant ? 'justify-start' : 'justify-end'} mb-4`}>
+      {isAssistant && (
+        <OllieAvatarThumb state={message.avatar_state ?? currentOllieState ?? 'neutral'} />
+      )}
       <article
         aria-label={`Mensagem de ${isAssistant ? 'OWL' : 'você'}`}
         className={`max-w-[80%] rounded-2xl px-5 py-4 text-base leading-relaxed group ${
@@ -61,6 +96,7 @@ export function ChatBubble({ message, onFeedback }: Props) {
           </div>
         )}
       </article>
+      {!isAssistant && <UserAvatarThumb />}
     </div>
   )
 }
