@@ -28,6 +28,8 @@ const STAGE_COLORS: Record<AvatarState, string> = {
 export default function ChatPage() {
   const { user, logout } = useAuth()
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
   const { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement } = useChat()
   const { isListening, isSpeaking: speechIsSpeaking, transcript, supported, startListening, stopListening } = useSpeech()
   const [audioEnabled, setAudioEnabled] = useState(false)
@@ -112,7 +114,7 @@ export default function ChatPage() {
             beakOpen={beakOpen}
           />
           <EmotionControls
-            visible={user?.role === 'admin'}
+            visible={mounted && user?.role === 'admin'}
             avatarState={avatarState}
             movement={movement}
             onStateChange={setAvatarState}
@@ -127,34 +129,41 @@ export default function ChatPage() {
           aria-live="polite"
           aria-label="Conversa com OLLIE"
         >
-          {messages.map(msg => (
-            <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} />
-          ))}
-          {isLoading && (
-            <div aria-label="Carregando resposta" className="flex gap-1 p-3">
-              <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+          <div className="max-w-3xl mx-auto w-full">
+            {messages.map(msg => (
+              <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} currentOllieState={avatarState} />
+            ))}
+            {isLoading && (
+              <div className="flex items-end gap-2 mb-4">
+                <div className="w-10 h-10 shrink-0" />
+                <div aria-label="Carregando resposta" className="flex gap-1 p-3">
+                  <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
         </main>
 
         {/* Quick replies + Input */}
         <div className="shrink-0">
-          {quickReplies.length > 0 && (
-            <QuickReply options={quickReplies} onSelect={handleSend} />
-          )}
-          <ChatInput
-            onSend={handleSend}
-            disabled={isLoading}
-            isListening={isListening}
-            isSpeaking={speechIsSpeaking || ttsIsSpeaking}
-            speechSupported={supported}
-            onToggleListen={handleToggleListen}
-            onToggleSpeak={handleToggleSpeak}
-            transcript={transcript}
-          />
+          <div className="max-w-3xl mx-auto w-full">
+            {quickReplies.length > 0 && (
+              <QuickReply options={quickReplies} onSelect={handleSend} />
+            )}
+            <ChatInput
+              onSend={handleSend}
+              disabled={isLoading}
+              isListening={isListening}
+              isSpeaking={audioEnabled || speechIsSpeaking || ttsIsSpeaking}
+              speechSupported={mounted && supported}
+              onToggleListen={handleToggleListen}
+              onToggleSpeak={handleToggleSpeak}
+              transcript={transcript}
+            />
+          </div>
         </div>
       </div>
 
