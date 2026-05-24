@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -12,6 +13,10 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { user, logout } = useAuth()
+
+  const [mounted, setMounted] = useState(false)
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setMounted(true) }, [])
 
   const isChatPage = pathname === '/chat'
   const isAdmin = user?.role && ['admin', 'admin_ppgec'].includes(user.role)
@@ -43,7 +48,7 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
       <span className="font-bold text-ink text-lg">NeuroGuia</span>
 
       <nav className="ml-auto flex items-center gap-3 text-sm" aria-label="Navegação principal">
-        {isChatPage ? (
+        {mounted && (isChatPage ? (
           <>
             {isAdmin && (
               <>
@@ -71,15 +76,17 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
             </svg>
             Voltar ao Chat
           </Link>
+        ))}
+        {mounted && user && (
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="text-slate-text hover:text-ink min-h-[44px] px-2"
+          >
+            Sair
+          </button>
         )}
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="text-slate-text hover:text-ink min-h-[44px] px-2"
-        >
-          Sair
-        </button>
-        {user && (
+        {mounted && user && (
           <div
             aria-label={`Usuário: ${user.username}`}
             className="w-8 h-8 rounded-full bg-violet-soft text-violet flex items-center justify-center text-sm font-bold select-none"
