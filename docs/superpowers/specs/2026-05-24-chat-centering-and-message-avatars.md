@@ -71,19 +71,31 @@ New structure:
 
 ### OllieAvatarThumb
 
-An inline helper inside `ChatBubble.tsx` (not exported):
+An inline helper inside `ChatBubble.tsx` (not exported).
+
+`OllieAvatar` has `w-48 h-48` (192px) hardcoded. To render it at 40px, wrap it in a CSS `scale()` transform inside the clipping container. No changes to OllieAvatar.
+
+Scale factor: `40 / 192 ≈ 0.208`. Vertical offset (`top: 35%`) shifts the center upward to show the owl's head/face rather than the geometric center of the SVG.
 
 ```tsx
 function OllieAvatarThumb({ state }: { state: AvatarState }) {
   return (
-    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-owl-orange/30">
-      <OllieAvatar avatarState={state} movement="idle" />
+    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-owl-orange/30 relative">
+      <div style={{
+        position: 'absolute',
+        top: '35%',
+        left: '50%',
+        transform: 'translate(-50%, -50%) scale(0.208)',
+        transformOrigin: 'center center',
+      }}>
+        <OllieAvatar avatarState={state} movement="idle" />
+      </div>
     </div>
   )
 }
 ```
 
-`OllieAvatar` renders at `w-48 h-48` internally but is inside a 40×40 clipping container — the SVG scales down via the `viewBox`. No changes to OllieAvatar.
+The exact `top` offset can be fine-tuned during implementation to best frame the owl's face in the 40px circle.
 
 ### UserAvatarThumb
 
