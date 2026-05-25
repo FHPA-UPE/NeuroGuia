@@ -231,10 +231,10 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
             <stop offset="100%" stopColor="#FCE4A6" stopOpacity="0" />
           </radialGradient>
 
-          <radialGradient id={`ollieHatGrad-${uid}`} cx="40%" cy="20%" r="80%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#EAB028" />
-            <stop offset="55%"  stopColor="#C27C14" />
-            <stop offset="100%" stopColor="#8A5005" />
+          <radialGradient id={`ollieHatGrad-${uid}`} cx="35%" cy="20%" r="80%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#2A3F7E" />
+            <stop offset="55%"  stopColor="#1A2B5C" />
+            <stop offset="100%" stopColor="#0D1A3A" />
           </radialGradient>
 
           <filter id={`ollieBodyDepth-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
@@ -280,18 +280,18 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
 
             {/* Hat — mortarboard graduation cap */}
             {/* Hat crown top (square) */}
-            <rect x="54"  y="6"  width="132" height="38" rx="3"  fill={`url(#ollieHatGrad-${uid})`} stroke="#3D2000" strokeWidth="1.5" />
+            <rect x="54"  y="6"  width="132" height="38" rx="3"  fill={`url(#ollieHatGrad-${uid})`} stroke="#0A1020" strokeWidth="1.5" />
             {/* Hat crown top highlight */}
             <rect x="58"  y="8"  width="80"  height="10" rx="2"  fill="white" opacity="0.18" />
             {/* Hat band - curved white strip */}
-            <rect x="50"  y="42" width="140" height="12" rx="3"  fill="#F5F0E5" stroke="#D8C890" strokeWidth="1" />
+            <rect x="50"  y="42" width="140" height="12" rx="3"  fill="#E8B020" stroke="#C27A00" strokeWidth="1" />
             {/* Hat brim */}
-            <rect x="28"  y="52" width="184" height="13" rx="5"  fill={`url(#ollieHatGrad-${uid})`} stroke="#3D2000" strokeWidth="1.5" />
+            <rect x="28"  y="52" width="184" height="13" rx="5"  fill={`url(#ollieHatGrad-${uid})`} stroke="#0A1020" strokeWidth="1.5" />
             {/* Hat brim shadow */}
-            <rect x="32"  y="63" width="176" height="5"  rx="3"  fill="#3D2000" opacity="0.25" />
-            <line x1="182" y1="10" x2="208" y2="40" stroke="#6A3400" strokeWidth="2.5" />
-            <circle data-testid="ollie-hat-tassel" cx="210" cy="43" r="9" fill="#6A3400" />
-            <circle cx="210" cy="43" r="5" fill="#9A4E06" />
+            <rect x="32"  y="63" width="176" height="5"  rx="3"  fill="#0A1020" opacity="0.25" />
+            <line x1="182" y1="10" x2="208" y2="40" stroke="#E8B020" strokeWidth="2.5" />
+            <circle data-testid="ollie-hat-tassel" cx="210" cy="43" r="9" fill="#D4900A" />
+            <circle cx="210" cy="43" r="5" fill="#F0C040" />
 
             {/* No ear tufts — reference Ollie has a smooth round head */}
 
