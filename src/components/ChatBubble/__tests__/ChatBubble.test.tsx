@@ -45,21 +45,21 @@ test('chama onFeedback com down ao clicar 👎', () => {
   expect(onFeedback).toHaveBeenCalledWith('1', 'down')
 })
 
-test('bot message renders OllieAvatarThumb using message.avatar_state', () => {
+test('bot message renders OwlAvatarThumb using message.avatar_state', () => {
   render(<ChatBubble message={{ ...baseMsg, avatar_state: 'happy' }} onFeedback={() => {}} />)
-  expect(screen.getByRole('img', { name: /OLLIE está feliz/i })).toBeInTheDocument()
+  expect(screen.getByRole('img', { name: /OWL está feliz/i })).toBeInTheDocument()
 })
 
-test('bot message uses currentOllieState as fallback when message.avatar_state is undefined', () => {
+test('bot message uses currentOwlState as fallback when message.avatar_state is undefined', () => {
   const msg = { ...baseMsg, avatar_state: undefined }
-  render(<ChatBubble message={msg} onFeedback={() => {}} currentOllieState="encouraging" />)
-  expect(screen.getByRole('img', { name: /OLLIE está encorajador/i })).toBeInTheDocument()
+  render(<ChatBubble message={msg} onFeedback={() => {}} currentOwlState="encouraging" />)
+  expect(screen.getByRole('img', { name: /OWL está encorajador/i })).toBeInTheDocument()
 })
 
 test('bot message falls back to neutral when both avatar states are undefined', () => {
   const msg = { ...baseMsg, avatar_state: undefined }
   render(<ChatBubble message={msg} onFeedback={() => {}} />)
-  expect(screen.getByRole('img', { name: /OLLIE está neutro/i })).toBeInTheDocument()
+  expect(screen.getByRole('img', { name: /OWL está neutro/i })).toBeInTheDocument()
 })
 
 test('user message renders UserAvatarThumb', () => {
@@ -67,9 +67,9 @@ test('user message renders UserAvatarThumb', () => {
   expect(screen.getByTestId('user-avatar-thumb')).toBeInTheDocument()
 })
 
-test('user message does not render OllieAvatarThumb', () => {
+test('user message does not render OwlAvatarThumb', () => {
   render(<ChatBubble message={{ ...baseMsg, role: 'user' }} onFeedback={() => {}} />)
-  expect(screen.queryByRole('img', { name: /OLLIE está/i })).toBeNull()
+  expect(screen.queryByRole('img', { name: /OWL está/i })).toBeNull()
 })
 
 test('bot message does not render UserAvatarThumb', () => {

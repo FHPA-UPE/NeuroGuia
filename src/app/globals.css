@@ -56,8 +56,7 @@
     scroll-behavior: auto !important;
   }
   .owl-idle, .owl-talking, .owl-thinking, .owl-talk,
-  .ollie-idle, .ollie-talking, .ollie-thinking,
-  .ollie-thoughtful [data-testid="ollie-hat-tassel"] { animation: none; }
+  .owl-thoughtful [data-testid="owl-hat-tassel"] { animation: none; }
 }
 
 @keyframes owl-idle-bob {
@@ -98,34 +97,4 @@
 .owl-thinking{ animation: owl-think-spin 3s ease-in-out infinite; }
 .owl-talk    { animation: owl-talk-beak  0.24s ease-in-out; }
 
-@keyframes ollie-bob {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-6px); }
-}
-
-@keyframes ollie-talk-bob {
-  0%, 100% { transform: translateY(0) scaleX(1);       }
-  25%       { transform: translateY(-4px) scaleX(1.03); }
-  75%       { transform: translateY(2px) scaleX(0.98);  }
-}
-
-@keyframes ollie-think {
-  0%, 100% { transform: rotate(0deg);  }
-  30%       { transform: rotate(-8deg); }
-  70%       { transform: rotate(6deg);  }
-}
-
-@keyframes ollie-tassel-pendulum {
-  0%, 100% { transform: rotate(-20deg); }
-  50%       { transform: rotate(20deg);  }
-}
-
-.ollie-idle     { animation: ollie-bob      3s    ease-in-out infinite; }
-.ollie-talking  { animation: ollie-talk-bob 0.35s ease-in-out infinite; }
-.ollie-thinking { animation: ollie-think    2.5s  ease-in-out infinite; }
-
-.ollie-thoughtful [data-testid="ollie-hat-tassel"] {
-  transform-box: fill-box;
-  transform-origin: top center;
-  animation: ollie-tassel-pendulum 1.5s ease-in-out infinite;
-}
+/* Moved to owl-* classes above */

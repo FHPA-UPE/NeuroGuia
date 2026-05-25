@@ -1,6 +1,6 @@
 # NeuroGuia
 
-Assistente educacional com avatar interativo **OLLIE** desenvolvido para apoiar estudantes neurodivergentes do PPGEC/UPE. O projeto é composto por um **frontend em Next.js** (React + TypeScript) e um **backend em Python** (FastAPI) que se comunicam via API REST com streaming Server-Sent Events (SSE).
+Assistente educacional com avatar interativo **OWL** desenvolvido para apoiar estudantes neurodivergentes do PPGEC/UPE. O projeto é composto por um **frontend em Next.js** (React + TypeScript) e um **backend em Python** (FastAPI) que se comunicam via API REST com streaming Server-Sent Events (SSE).
 
 ## Arquitetura
 
@@ -64,6 +64,16 @@ copy config.json.example config.json  # ou cp no macOS/Linux
 ```env
 GOOGLE_API_KEY=your_api_key_here
 ```
+
+#### Como gerar uma Google Gemini API Key
+
+1. Acesse [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Clique em **"Create API Key"**
+3. Escolha **"Create API key in new project"** ou use um projeto existente
+4. Copie a chave gerada
+5. Cole no arquivo `.env` como `GOOGLE_API_KEY=sua_chave_aqui`
+
+> **Nota:** A chave é gratuita para desenvolvimento. Verifique a [documentação oficial](https://ai.google.dev/) para limites de quotas e planos pagos.
 
 ### 3. Setup do Frontend (Next.js)
 
@@ -129,7 +139,7 @@ python -m pytest backend/tests/       # Rodar testes
 ## Funcionalidades
 
 - **Chat interativo** — interface com histórico de mensagens
-- **Avatar OLLIE** — expressões faciais dinâmicas (neutral, happy, encouraging, empathetic, thoughtful)
+- **Avatar OWL** — expressões faciais dinâmicas (neutral, happy, encouraging, empathetic, thoughtful)
 - **Movimentação do avatar** — estados de repouso, comunicação e pensamento (idle, talking, thinking)
 - **Autenticação** — login e gerenciamento de usuários
 - **Feedback** — coleta de feedback do usuário

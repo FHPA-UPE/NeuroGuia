@@ -6,7 +6,7 @@ import { useChat } from '@/hooks/useChat'
 import { useSpeech } from '@/hooks/useSpeech'
 import { useTTS } from '@/hooks/useTTS'
 import { AppHeader } from '@/components/AppHeader'
-import OllieAvatar from '@/components/OllieAvatar/OllieAvatar'
+import OwlAvatar from '@/components/OwlAvatar/OwlAvatar'
 import { ChatBubble } from '@/components/ChatBubble'
 import { ChatInput } from '@/components/ChatInput'
 import { EmotionControls } from '@/components/EmotionControls'
@@ -110,12 +110,12 @@ export default function ChatPage() {
       <AppHeader onLogout={handleLogout} />
 
       <div className="flex flex-col h-[calc(100vh-64px)] bg-cream">
-        {/* Zona de palco OLLIE */}
+        {/* Zona de palco OWL */}
         <div
           className="flex flex-col items-center pt-5 pb-3 shrink-0"
           style={{ backgroundColor: STAGE_COLORS[avatarState], transition: 'background-color 0.4s ease' }}
         >
-          <OllieAvatar
+          <OwlAvatar
             avatarState={avatarState}
             movement={effectiveMovement}
             beakOpen={beakOpen}
@@ -134,7 +134,7 @@ export default function ChatPage() {
           id="main-content"
           className="flex-1 overflow-y-auto px-4 py-4"
           aria-live="polite"
-          aria-label="Conversa com OLLIE"
+          aria-label="Conversa com OWL"
         >
           <div className="max-w-3xl mx-auto w-full">
             {messages.length > 0 && (
@@ -152,7 +152,7 @@ export default function ChatPage() {
               </div>
             )}
             {messages.map(msg => (
-              <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} currentOllieState={avatarState} />
+              <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} currentOwlState={avatarState} />
             ))}
             {isLoading && (
               <div className="flex items-end gap-2 mb-4">

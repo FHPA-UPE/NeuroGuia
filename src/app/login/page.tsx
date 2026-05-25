@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/hooks/useAuth'
-import OllieAvatar from '@/components/OllieAvatar/OllieAvatar'
+import OwlAvatar from '@/components/OwlAvatar/OwlAvatar'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -139,7 +139,7 @@ export default function LoginPage() {
         </div>
 
           <div className="hidden md:flex shrink-0 pointer-events-none scale-125 origin-center" aria-hidden="true">
-            <OllieAvatar avatarState="neutral" movement="idle" />
+            <OwlAvatar avatarState="neutral" movement="idle" />
           </div>
         </div>
       </main>
