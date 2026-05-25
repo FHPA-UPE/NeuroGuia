@@ -58,9 +58,9 @@ describe('OllieAvatar', () => {
     expect(screen.getByTestId('ollie-mouth-interior')).toBeInTheDocument()
   })
 
-  it('chapéu mortarboard presente no SVG', () => {
-    const { container } = render(<OllieAvatar avatarState="neutral" movement="idle" />)
-    expect(container.querySelector('svg')).toBeInTheDocument()
+  it('chapéu mortarboard com tassel presente no SVG', () => {
+    render(<OllieAvatar avatarState="neutral" movement="idle" />)
+    expect(screen.getByTestId('ollie-hat-tassel')).toBeInTheDocument()
   })
 
   it('grupo da cabeça inclina diferente entre estados com tilt diferente', () => {
@@ -78,12 +78,6 @@ describe('OllieAvatar', () => {
   it('estado empathetic renderiza wink no olho direito', () => {
     render(<OllieAvatar avatarState="empathetic" movement="idle" />)
     expect(screen.getByTestId('ollie-eye-right-wink')).toBeInTheDocument()
-    expect(screen.queryByTestId('ollie-right-eye')).not.toBeInTheDocument()
-  })
-
-  it('estado empathetic não renderiza pupila direita', () => {
-    render(<OllieAvatar avatarState="empathetic" movement="idle" />)
-    // ollie-right-eye sclera ausente → pupila também ausente (sem clipPath destino)
     expect(screen.queryByTestId('ollie-right-eye')).not.toBeInTheDocument()
   })
 

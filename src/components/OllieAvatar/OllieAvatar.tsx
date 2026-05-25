@@ -173,6 +173,8 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
   const leftPupilCy  = expr.leftPupil.cy  + expr.eyeLidOffset
   const rightPupilCy = expr.rightPupil.cy + expr.eyeLidOffset
   const isBeakOpen   = beakOpen || avatarState === 'happy' || avatarState === 'encouraging'
+  // beakOpen=true (TTS falando) sempre usa o shape genérico de boca aberta,
+  // sobrescrevendo o beakPath específico do estado — comportamento intencional.
   const beakPathFinal = isBeakOpen ? BEAK_OPEN : expr.beakPath
 
   return (
