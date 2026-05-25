@@ -75,7 +75,20 @@ GOOGLE_API_KEY=your_api_key_here
 
 > **Nota:** A chave é gratuita para desenvolvimento. Verifique a [documentação oficial](https://ai.google.dev/) para limites de quotas e planos pagos.
 
-### 3. Setup do Frontend (Next.js)
+### 3. Crie o usuário admin inicial
+
+```bash
+# Na pasta backend (ambiente virtual ativado)
+python seed_admin.py
+```
+
+Isso criará um usuário admin. Você será solicitado a fornecer:
+- **Username** (padrão: `admin`)
+- **Senha** (será solicitada de forma segura)
+
+> Guarde essas credenciais — serão usadas para acessar o sistema no login.
+
+### 4. Setup do Frontend (Next.js)
 
 ```bash
 # Volta à raiz do projeto
@@ -117,6 +130,21 @@ npm run dev
 ```
 
 Acesse [http://localhost:3000](http://localhost:3000) no navegador. O backend estará disponível em [http://localhost:8000](http://localhost:8000).
+
+### Passo final: Ingerir documentos educacionais
+
+O sistema vem com o banco de dados vetorial vazio. Para usar o chatbot com conteúdo educacional:
+
+1. Acesse [http://localhost:3000](http://localhost:3000) e faça login com suas credenciais
+2. Vá para a seção **"Ingest de Documentos"** (painel admin)
+3. Upload de arquivos suportados:
+   - **PDF** (.pdf)
+   - **Texto plano** (.txt)
+   - **Word** (.docx)
+4. O sistema processa, particiona em chunks e cria embeddings automaticamente
+5. Os documentos estarão disponíveis para o RAG (Retrieval-Augmented Generation) do chatbot
+
+> **Limite:** máximo 20 MB por arquivo. Limite de quotas do Google Gemini: verificar [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 ## Scripts disponíveis
 
