@@ -283,19 +283,37 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
             <ellipse cx="120" cy="120" rx="62" ry="54" fill={`url(#ollieFaceDiscGrad-${uid})`} />
 
             {/* Hat — mortarboard graduation cap */}
-            {/* Hat crown top (square) */}
-            <rect x="54"  y="6"  width="132" height="38" rx="3"  fill={`url(#ollieHatGrad-${uid})`} stroke="#0A1020" strokeWidth="1.5" />
+            {/* Piping creme atrás da coroa */}
+            <rect x="59" y="-1" width="122" height="52" rx="6" fill="#F5EFE0" stroke="#D8C898" strokeWidth="1" />
+            {/* Hat crown top */}
+            <rect x="62" y="2" width="116" height="46" rx="4" fill={`url(#ollieHatGrad-${uid})`} stroke="#3D2000" strokeWidth="1" />
+            {/* Felt texture overlay */}
+            <rect x="62" y="2" width="116" height="46" rx="4" fill={`url(#ollieFelt-${uid})`} />
             {/* Hat crown top highlight */}
-            <rect x="58"  y="8"  width="80"  height="10" rx="2"  fill="white" opacity="0.18" />
-            {/* Hat band - curved white strip */}
-            <rect x="50"  y="42" width="140" height="12" rx="3"  fill="#E8B020" stroke="#C27A00" strokeWidth="1" />
+            <rect x="66" y="5" width="72" height="10" rx="2" fill="white" opacity="0.18" />
+            {/* Hat band */}
+            <rect x="52" y="46" width="136" height="10" rx="3" fill="#F5F0E5" stroke="#D8C890" strokeWidth="1" />
             {/* Hat brim */}
-            <rect x="28"  y="52" width="184" height="13" rx="5"  fill={`url(#ollieHatGrad-${uid})`} stroke="#0A1020" strokeWidth="1.5" />
+            <rect x="30" y="54" width="180" height="12" rx="6" fill={`url(#ollieHatGrad-${uid})`} stroke="#3D2000" strokeWidth="1.5" />
             {/* Hat brim shadow */}
-            <rect x="32"  y="63" width="176" height="5"  rx="3"  fill="#0A1020" opacity="0.25" />
-            <line x1="182" y1="10" x2="208" y2="40" stroke="#E8B020" strokeWidth="2.5" />
-            <circle data-testid="ollie-hat-tassel" cx="210" cy="43" r="9" fill="#D4900A" />
-            <circle cx="210" cy="43" r="5" fill="#F0C040" />
+            <rect x="34" y="64" width="172" height="5" rx="3" fill="#3D2000" opacity="0.25" />
+            {/* Center button */}
+            <circle cx="120" cy="25" r="5" fill="#F0EAD8" stroke="#C8B888" strokeWidth="1" />
+            <circle cx="120" cy="25" r="2.5" fill="#E8DFCA" />
+            {/* Cord: center button → crown top-right corner → tassel knot */}
+            <path d="M 120,25 L 178,8 L 205,43" stroke="#C88810" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Tassel knot */}
+            <circle data-testid="ollie-hat-tassel" cx="205" cy="43" r="6" fill="#C88810" stroke="#8A5C05" strokeWidth="1" />
+            {/* Tassel threads */}
+            <g stroke="#F0EAD8" strokeWidth="1.2" strokeLinecap="round" opacity="0.90">
+              <line x1="199" y1="49" x2="196" y2="66" />
+              <line x1="201" y1="49" x2="199" y2="68" />
+              <line x1="203" y1="49" x2="202" y2="69" />
+              <line x1="205" y1="49" x2="205" y2="69" />
+              <line x1="207" y1="49" x2="208" y2="69" />
+              <line x1="209" y1="49" x2="211" y2="68" />
+              <line x1="211" y1="49" x2="214" y2="66" />
+            </g>
 
             {/* No ear tufts — reference Ollie has a smooth round head */}
 
