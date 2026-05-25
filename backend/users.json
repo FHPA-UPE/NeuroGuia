@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "username": "estudante",
+    "password": "$2b$12$c.0wp10AU6jdHoKH7ACy3uSgl.wARfSAUHs0saB1pY7xd/aTSYw6W",
+    "role": "estudante"
+  },
+  {
+    "username": "admin_ppgec",
+    "password": "$2b$12$N6gw4qiMYl5/Au5.drpKZ.FwXc4AWM0BzSKeuI5IpY4ZQJABrIICe",
+    "role": "admin_ppgec"
+  },
+  {
+    "username": "admin",
+    "password": "$2b$12$53HlHp89ovNCzmIPecRZDOMhHCOAYs9o.JbtwnaXA2dz3.fK5OWAO",
+    "role": "admin"
+  }
+]

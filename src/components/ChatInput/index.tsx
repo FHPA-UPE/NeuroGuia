@@ -29,8 +29,9 @@ export function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2 px-4 py-4 bg-cream-card border-t border-mist shadow-[0_-4px_12px_rgba(0,0,0,0.06)]"
+      className="py-4 w-full"
     >
+      <div className="flex items-center gap-2">
       {speechSupported && (
         <button
           type="button"
@@ -55,7 +56,7 @@ export function ChatInput({
         onChange={e => setText(e.target.value)}
         placeholder="Digite ou fale sua dúvida…"
         disabled={disabled}
-        className="flex-1 rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] placeholder:text-slate-text/60 disabled:opacity-60 focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
+        className="flex-1 rounded-2xl border border-mist px-5 py-4 text-base bg-cream min-h-[56px] placeholder:text-slate-text/60 disabled:opacity-60 focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
         aria-label="Mensagem para o OWL"
       />
 
@@ -86,6 +87,7 @@ export function ChatInput({
           <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
+      </div>
     </form>
   )
 }

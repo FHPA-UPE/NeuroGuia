@@ -31,7 +31,7 @@ export default function ChatPage() {
   const [mounted, setMounted] = useState(false)
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true) }, [])
-  const { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement } = useChat()
+  const { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement, clearMessages } = useChat()
   const { isListening, isSpeaking: speechIsSpeaking, transcript, supported, startListening, stopListening } = useSpeech()
   const [audioEnabled, setAudioEnabled] = useState(false)
   const lastAssistantText = !isLoading
@@ -89,14 +89,20 @@ export default function ChatPage() {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },
       body: JSON.stringify({ type: 'session', emoji, message_count: messages.length }),
     }).catch(() => {})
+    clearMessages()
     setShowRating(false)
   }
 
   function handleLogout() {
     if (messages.length > 0) { setShowRating(true); return }
+    clearMessages()
     document.cookie = 'access_token=; path=/; max-age=0'
     logout()
     router.push('/login')
+  }
+
+  function handleClearChat() {
+    clearMessages()
   }
 
   return (
@@ -131,6 +137,20 @@ export default function ChatPage() {
           aria-label="Conversa com OLLIE"
         >
           <div className="max-w-3xl mx-auto w-full">
+            {messages.length > 0 && (
+              <div className="flex justify-end mb-2">
+                <button
+                  type="button"
+                  onClick={handleClearChat}
+                  className="flex items-center gap-1.5 text-xs text-slate-text hover:text-error border border-mist hover:border-error/40 hover:bg-error/5 rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Limpar conversa
+                </button>
+              </div>
+            )}
             {messages.map(msg => (
               <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} currentOllieState={avatarState} />
             ))}
@@ -149,8 +169,8 @@ export default function ChatPage() {
         </main>
 
         {/* Quick replies + Input */}
-        <div className="shrink-0">
-          <div className="max-w-3xl mx-auto w-full">
+        <div className="shrink-0 bg-cream-card border-t border-mist shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+          <div className="max-w-3xl mx-auto w-full px-4">
             {quickReplies.length > 0 && (
               <QuickReply options={quickReplies} onSelect={handleSend} />
             )}
@@ -183,6 +203,7 @@ export default function ChatPage() {
             router.push('/login')
           }}
           onDismiss={() => {
+            clearMessages()
             setShowRating(false)
             document.cookie = 'access_token=; path=/; max-age=0'
             logout()

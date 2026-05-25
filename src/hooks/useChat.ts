@@ -1,19 +1,41 @@
 'use client'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { ChatMessage, ChatResponse, AvatarState, Movement } from '@/types/chat'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+const STORAGE_KEY = 'chat_history'
 
 function makeId() {
   return Math.random().toString(36).slice(2)
 }
 
+function loadMessages(): ChatMessage[] {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
 export function useChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>(() => loadMessages())
   const [avatarState, setAvatarState] = useState<AvatarState>('neutral')
   const [movement, setMovement] = useState<Movement>('idle')
   const [isLoading, setIsLoading] = useState(false)
   const [quickReplies, setQuickReplies] = useState<string[]>([])
+
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+  }, [messages])
+
+  const clearMessages = useCallback(() => {
+    sessionStorage.removeItem(STORAGE_KEY)
+    setMessages([])
+    setAvatarState('neutral')
+    setMovement('idle')
+    setQuickReplies([])
+  }, [])
 
   const sendMessage = useCallback(async (text: string) => {
     const userMsg: ChatMessage = { id: makeId(), role: 'user', content: text }
@@ -93,5 +115,5 @@ export function useChat() {
     }
   }, [messages])
 
-  return { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement }
+  return { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement, clearMessages }
 }

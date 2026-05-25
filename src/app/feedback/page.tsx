@@ -8,7 +8,6 @@ function token() { return sessionStorage.getItem('access_token') ?? '' }
 interface FeedbackData {
   sessions: { emoji: string; message_count: number; timestamp: string }[]
   negative_messages: { question: string; answer: string; sources: string[]; timestamp: string }[]
-  rag_gaps: { question: string; count: number }[]
 }
 
 export default function FeedbackPage() {
@@ -65,7 +64,7 @@ export default function FeedbackPage() {
           </div>
         </section>
 
-        <section aria-label="Respostas com avaliação negativa" className="bg-cream-card rounded-2xl border border-mist p-5 mb-6 shadow-sm">
+        <section aria-label="Respostas com avaliação negativa" className="bg-cream-card rounded-2xl border border-mist p-5 shadow-sm">
           <h2 className="text-lg font-semibold text-ink mb-3">Respostas 👎 ({data.negative_messages.length})</h2>
           {data.negative_messages.length === 0
             ? <p className="text-slate-text text-sm">Nenhuma avaliação negativa ainda.</p>
@@ -76,25 +75,6 @@ export default function FeedbackPage() {
                     <p className="text-sm font-semibold text-ink">P: {m.question}</p>
                     <p className="text-sm text-slate-text mt-1">R: {m.answer}</p>
                     <p className="text-xs text-slate-text/60 mt-1">{m.sources.join(', ')}</p>
-                  </li>
-                ))}
-              </ul>
-            )
-          }
-        </section>
-
-        <section aria-label="Lacunas no RAG" className="bg-cream-card rounded-2xl border border-mist p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-ink mb-3">Lacunas RAG (sem fonte identificada)</h2>
-          {data.rag_gaps.length === 0
-            ? <p className="text-slate-text text-sm">Nenhuma lacuna registrada.</p>
-            : (
-              <ul className="space-y-2">
-                {data.rag_gaps.map((g, i) => (
-                  <li key={i} className="flex items-center justify-between border-t border-mist pt-2">
-                    <span className="text-sm text-ink">{g.question}</span>
-                    <span className="text-sm font-bold text-owl-orange-dark bg-owl-orange-soft rounded-full px-2 py-0.5">
-                      {g.count}×
-                    </span>
                   </li>
                 ))}
               </ul>

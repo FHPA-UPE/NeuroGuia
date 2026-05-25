@@ -1,7 +1,10 @@
 import asyncio
 import json
+import logging
 import re
 from typing import AsyncGenerator, Optional
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -64,14 +67,21 @@ async def _stream(request: ChatRequest) -> AsyncGenerator:
             buffer += token
 
         parsed = _parse_json_response(buffer)
-        llm_sources = parsed.get("sources", [])
-        if llm_sources not in (["Conhecimento / treinamento do modelo"], ["Sem identificação da fonte"]):
+        if docs:
             parsed["sources"] = sources
 
         yield {"data": json.dumps(parsed, ensure_ascii=False)}
     except Exception as e:
+        logger.exception("Erro na chamada ao LLM: %s", e)
+        err_str = str(e).lower()
+        if "ratelimit" in err_str or "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str:
+            message = "Cota da API do provedor de IA esgotada. Verifique seu plano e limites de uso nas configurações."
+        elif "timeout" in err_str or "timed out" in err_str:
+            message = "Ops, demorei demais para responder. Tente novamente."
+        else:
+            message = "Ocorreu um erro ao processar sua mensagem. Tente novamente."
         yield {"data": json.dumps({
-            "message": "Ops, demorei demais para responder. Tente novamente.",
+            "message": message,
             "avatar_state": "empathetic", "movement": "talking",
             "quick_replies": [], "sources": [],
         })}

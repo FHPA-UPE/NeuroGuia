@@ -16,24 +16,26 @@
   --color-success:         #1A7F5A;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-body {
-  font-family: var(--font-atkinson), 'Atkinson Hyperlegible', sans-serif;
-  background-color: var(--color-cream);
-  color: var(--color-ink);
-  font-size: 17px;
-  line-height: 1.75;
-  letter-spacing: 0.02em;
-}
+  body {
+    font-family: var(--font-atkinson), 'Atkinson Hyperlegible', sans-serif;
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-size: 17px;
+    line-height: 1.75;
+    letter-spacing: 0.02em;
+  }
 
-*:focus-visible {
-  outline: 3px solid var(--color-owl-orange-dark);
-  outline-offset: 3px;
+  *:focus-visible {
+    outline: 3px solid var(--color-owl-orange-dark);
+    outline-offset: 3px;
+  }
 }
 
 ::-webkit-scrollbar { width: 3px; }

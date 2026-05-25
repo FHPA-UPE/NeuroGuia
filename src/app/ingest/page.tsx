@@ -97,7 +97,11 @@ export default function IngestPage() {
     const res = await fetch(`${API}/docs/ingest`, {
       method: 'POST', headers: { Authorization: `Bearer ${token()}` },
     })
-    if (!res.ok || !res.body) { setIngesting(false); return }
+    if (!res.ok) {
+      try { const e = await res.json(); setError(e.detail ?? 'Erro ao processar.') } catch { setError('Erro ao processar.') }
+      setIngesting(false); return
+    }
+    if (!res.body) { setIngesting(false); return }
     const reader = res.body.getReader()
     const decoder = new TextDecoder()
     let buf = ''
@@ -108,7 +112,14 @@ export default function IngestPage() {
       const lines = buf.split('\n'); buf = lines.pop() ?? ''
       for (const line of lines) {
         if (line.startsWith('data: ') && line !== 'data: {}') {
-          try { const d = JSON.parse(line.slice(6)); setProgress(p => [...p, `${d.file}: ${d.status}`]) } catch {}
+          try {
+            const d = JSON.parse(line.slice(6))
+            if (d.status === 'error') {
+              setProgress(p => [...p, `❌ ${d.file ?? 'Erro'}: ${d.detail}`])
+            } else if (d.file && d.status) {
+              setProgress(p => [...p, `${d.file}: ${d.status}`])
+            }
+          } catch {}
         }
       }
     }
@@ -166,7 +177,10 @@ export default function IngestPage() {
             <ul className="mt-3 text-sm space-y-1" aria-label="Progresso de ingestão">
               {progress.map((p, i) => (
                 <li key={i} className="flex items-center gap-2 text-slate-text">
-                  <span className="text-success" aria-hidden="true">✓</span> {p}
+                  <span aria-hidden="true" className={p.startsWith('❌') ? 'text-error' : 'text-success'}>
+                    {p.startsWith('❌') ? '✗' : '✓'}
+                  </span>
+                  {p.startsWith('❌') ? p.slice(2) : p}
                 </li>
               ))}
             </ul>

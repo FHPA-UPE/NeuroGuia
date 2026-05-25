@@ -1,15 +1,16 @@
 'use client'
 import { useState } from 'react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useAuth } from '@/hooks/useAuth'
-import { OwlAvatar } from '@/components/OwlAvatar'
+import OllieAvatar from '@/components/OllieAvatar/OllieAvatar'
 
 export default function LoginPage() {
   const { login } = useAuth()
   const router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -23,84 +24,125 @@ export default function LoginPage() {
       document.cookie = `access_token=${token}; path=/; SameSite=Strict`
       router.push('/chat')
     } catch {
-      setError('Usuário ou senha incorretos.')
+      setError('Não foi possível acessar. Verifique seu usuário e tente novamente.')
     } finally {
       setLoading(false)
     }
   }
 
+  const inputClass = "w-full rounded-2xl border-2 border-mist px-5 py-4 text-base bg-cream text-ink tracking-wide min-h-[52px] transition-colors focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
+
   return (
-    <main
-      className="min-h-screen flex flex-col items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg, #FFFBF4 0%, #EDE8F8 100%)' }}
-    >
-      <div className="bg-cream-card rounded-3xl shadow-xl px-8 py-10 w-full max-w-sm">
-        <div className="flex flex-col items-center mb-6">
-          <Image
-            src="/ppgec-logo-circular.jpg"
-            alt="PPGEC UPE"
-            width={80}
-            height={80}
-            className="rounded-full mb-3"
-            priority
-          />
-          <h1 className="text-2xl font-bold text-ink text-center">NeuroGuia</h1>
-          <p className="text-sm text-slate-text text-center mt-1">
-            Assistente para estudantes do PPGEC · UPE
-          </p>
+    <>
+      <main
+        className="min-h-screen flex items-center justify-center px-5 py-8"
+        style={{ background: 'linear-gradient(135deg, #FFFBF4 0%, #EDE8F8 100%)' }}
+      >
+        <div className="flex items-center gap-10 w-full max-w-3xl">
+        <div className="bg-cream-card rounded-3xl shadow-xl px-14 py-14 w-full max-w-lg">
+          <div className="flex flex-col items-center mb-10">
+            <Image
+              src="/ppgec-logo.png"
+              alt="PPGEC UPE"
+              height={48}
+              width={160}
+              className="object-contain mb-5"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-ink text-center leading-snug">Bem-vindo ao NeuroGuia</h1>
+            <p className="text-base text-slate-text text-center mt-2 leading-relaxed">
+              Assistente para estudantes do PPGEC · UPE
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="login-username" className="text-base font-semibold text-ink">
+                Usuário
+              </label>
+              <input
+                id="login-username"
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                required
+                autoComplete="username"
+                aria-label="Nome de usuário"
+                aria-required="true"
+                placeholder="ex.: seu.nome"
+                className={inputClass}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="login-password" className="text-base font-semibold text-ink">
+                Senha
+              </label>
+              <div className="relative">
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  aria-label="Senha de acesso"
+                  aria-required="true"
+                  className={`${inputClass} pr-14`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-text hover:text-ink transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                >
+                  {showPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div role="alert" aria-live="assertive" aria-atomic="true">
+              {error && (
+                <p className="flex items-center gap-2 text-base text-ink bg-error/10 rounded-xl px-4 py-3 border border-error/30 leading-relaxed">
+                  <span aria-hidden="true">⚠️</span> {error}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              aria-disabled={loading}
+              className="bg-owl-orange hover:bg-owl-orange-dark text-white rounded-2xl py-4 px-6 text-base font-semibold min-h-[52px] flex items-center justify-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark focus-visible:ring-offset-2"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+                  </svg>
+                  Entrando…
+                </>
+              ) : 'Entrar'}
+            </button>
+          </form>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm font-medium text-ink">
-            Usuário
-            <input
-              type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              required
-              autoComplete="username"
-              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm font-medium text-ink">
-            Senha
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className="rounded-2xl border border-mist px-5 py-3.5 text-base bg-cream min-h-[48px] focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
-            />
-          </label>
-
-          {error && (
-            <p role="alert" className="flex items-center gap-2 text-sm text-ink bg-error/10 rounded-xl px-4 py-2.5 border border-error/30">
-              <span aria-hidden="true">⚠️</span> {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-owl-orange hover:bg-owl-orange-dark text-ink rounded-2xl py-3.5 px-5 font-semibold disabled:opacity-60 transition-colors min-h-[48px] flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
-                </svg>
-                Entrando…
-              </>
-            ) : 'Entrar →'}
-          </button>
-        </form>
-      </div>
-
-      <div className="mt-4 pointer-events-none" aria-hidden="true">
-        <OwlAvatar state="neutral" movement="idle" beakOpen={false} aria-label="OWL assistente decorativo" />
-      </div>
-    </main>
+          <div className="hidden md:flex shrink-0 pointer-events-none scale-125 origin-center" aria-hidden="true">
+            <OllieAvatar avatarState="neutral" movement="idle" />
+          </div>
+        </div>
+      </main>
+    </>
   )
 }

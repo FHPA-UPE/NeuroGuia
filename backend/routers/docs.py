@@ -1,6 +1,5 @@
 import asyncio
 import json
-import tempfile
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
@@ -66,12 +65,18 @@ async def ingest(user: dict = Depends(_require_role("admin_ppgec", "admin"))):
     if not files:
         raise HTTPException(status_code=404, detail="Nenhum arquivo encontrado em docs/")
 
-    embeddings = get_embeddings()
+    try:
+        embeddings = get_embeddings()
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
     queue: asyncio.Queue = asyncio.Queue()
 
     async def process():
         for f in files:
-            await ingest_service.ingest_file(f, embeddings, queue)
+            try:
+                await ingest_service.ingest_file(f, embeddings, queue)
+            except Exception as e:
+                await queue.put({"status": "error", "file": f.name, "detail": str(e)})
         await queue.put(None)
 
     task = asyncio.create_task(process())

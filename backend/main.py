@@ -1,12 +1,16 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.requests import Request
 from dotenv import load_dotenv
 from routers import auth as auth_router
 from routers import chat as chat_router
 from routers import config as config_router
 from routers import docs as docs_router
 from routers import feedback as feedback_router
+
+_ALLOWED_ORIGINS = ["http://localhost:3000"]
 
 load_dotenv()
 
@@ -31,6 +35,16 @@ app.include_router(chat_router.router)
 app.include_router(config_router.router)
 app.include_router(docs_router.router)
 app.include_router(feedback_router.router)
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    origin = request.headers.get("origin", "")
+    headers = {}
+    if origin in _ALLOWED_ORIGINS:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+    return JSONResponse({"detail": "Erro interno do servidor."}, status_code=500, headers=headers)
 
 
 @app.get("/health")

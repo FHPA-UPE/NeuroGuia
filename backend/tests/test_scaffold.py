@@ -5,7 +5,13 @@ BACKEND = Path(__file__).parent.parent
 
 def test_config_json_has_required_keys():
     cfg = json.loads((BACKEND / "config.json").read_text(encoding="utf-8"))
-    for key in ("system_prompt", "llm_provider", "llm_model", "embed_provider", "embed_model"):
+    required = (
+        "system_prompt", "llm_provider", "llm_model",
+        "llm_temperature", "llm_max_tokens",
+        "embed_provider", "embed_model",
+        "rag_retrieval_k", "rag_chunk_size", "rag_score_threshold",
+    )
+    for key in required:
         assert key in cfg, f"config.json missing key: {key}"
 
 def test_env_example_has_api_key_placeholders():
