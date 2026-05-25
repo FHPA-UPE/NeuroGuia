@@ -231,11 +231,15 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
             <stop offset="100%" stopColor="#FCE4A6" stopOpacity="0" />
           </radialGradient>
 
-          <radialGradient id={`ollieHatGrad-${uid}`} cx="35%" cy="20%" r="80%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#2A3F7E" />
-            <stop offset="55%"  stopColor="#1A2B5C" />
-            <stop offset="100%" stopColor="#0D1A3A" />
+          <radialGradient id={`ollieHatGrad-${uid}`} cx="35%" cy="25%" r="75%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#F0C040" />
+            <stop offset="55%"  stopColor="#C88810" />
+            <stop offset="100%" stopColor="#8A5C05" />
           </radialGradient>
+
+          <pattern id={`ollieFelt-${uid}`} x="0" y="0" width="5" height="5" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.7" fill="#7A4E04" opacity="0.18" />
+          </pattern>
 
           <filter id={`ollieBodyDepth-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="3" dy="5" stdDeviation="6" floodColor="#3A1800" floodOpacity="0.30" />
