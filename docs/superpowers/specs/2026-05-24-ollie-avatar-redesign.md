@@ -103,7 +103,7 @@ interface ExpressionConfig {
 type WingPose = 'rest' | 'raised-thumb' | 'raised-chin'
 ```
 
-Cada `WingPose` resolve para uma função que retorna JSX do grupo SVG correspondente.
+Cada `WingPose` resolve para JSX via função auxiliar `renderWingLeft(pose, uid)` / `renderWingRight(pose, uid)` definidas no mesmo arquivo, retornando um `<g data-testid="ollie-wing-*">` completo.
 
 ---
 
@@ -131,7 +131,7 @@ Cada `WingPose` resolve para uma função que retorna JSX do grupo SVG correspon
 | `bellyGrad`    | 50%/35% | `#FFFFFF → #F2EBD8 → #DACCB0` |
 | `wingGrad`     | 50%/25% | `#D98C18 → #6B3A02` |
 | `hatGrad`      | 42%/20% | `#E0A020 → #C07818 → #8A5005` |
-| `faceDiscGrad` | 50%/50% | `#FCE4A6 opac.50% → opac.0%` |
+| `faceDiscGrad` | 50%/50% | `#FCE4A6 opac.50% → opac.0%` (overlay luminoso no disco facial, não listado na paleta pois é semitransparente) |
 
 ### Filtro de profundidade
 
@@ -142,7 +142,7 @@ Cada `WingPose` resolve para uma função que retorna JSX do grupo SVG correspon
 </filter>
 ```
 
-Aplicado ao grupo `<g>` que envolve corpo + cabeça.
+Aplicado a um `<g filter="url(#bodyDepth-{uid})">` que envolve **as asas + corpo + head-group** como filhos diretos, garantindo sombra única sobre o conjunto.
 
 ---
 
@@ -192,6 +192,7 @@ Aplicado ao grupo `<g>` que envolve corpo + cabeça.
 | Parte | Valor |
 |-------|-------|
 | Pupilas | L `(90,126)` R `(150,126)` |
+| eyeLidOffset | 0 |
 | Sobrancelha E | `M 70 98 Q 90 91 110 98` |
 | Sobrancelha D | `M 130 98 Q 150 91 170 98` |
 | Olho shape | `open` (ry=26) |
@@ -204,7 +205,8 @@ Aplicado ao grupo `<g>` que envolve corpo + cabeça.
 ### HAPPY
 | Parte | Valor |
 |-------|-------|
-| Pupilas | L `(90,129)` R `(150,129)` |
+| Pupilas | L `(90,126)` R `(150,126)` |
+| eyeLidOffset | 3 (pupilas descem para `cy=129`) |
 | Sobrancelha E | `M 70 93 Q 90 84 110 93` (elevada) |
 | Sobrancelha D | `M 130 93 Q 150 84 170 93` |
 | Olho shape | `squint` (ry=20) |
@@ -217,10 +219,11 @@ Aplicado ao grupo `<g>` que envolve corpo + cabeça.
 ### ENCOURAGING
 | Parte | Valor |
 |-------|-------|
-| Pupilas | L `(90,124)` R `(150,124)` (animadas, olhar alto) |
+| Pupilas | L `(90,124)` R `(150,124)` |
+| eyeLidOffset | -2 (pupilas sobem) |
 | Sobrancelha E | `M 70 90 Q 90 82 110 90` (muito elevada) |
 | Sobrancelha D | `M 130 90 Q 150 82 170 90` |
-| Olho shape | `open` |
+| Olho shape | `open` (ry=26) |
 | Bico inf. | sorriso largo (igual a happy) |
 | Interior boca | sim |
 | Wink direito | false |
@@ -232,10 +235,11 @@ Aplicado ao grupo `<g>` que envolve corpo + cabeça.
 | Parte | Valor |
 |-------|-------|
 | Pupilas | L `(90,128)` R — sem pupila (wink) |
+| eyeLidOffset | 2 (pupila esquerda desce) |
 | Sobrancelha E | `M 70 98 Q 90 91 110 98` |
 | Sobrancelha D | `M 130 103 Q 150 98 170 105` (levemente baixa) |
 | Olho shape E | `soft` (ry=22) |
-| **Olho direito** | **wink** — `<path d="M 124,126 Q 150,112 176,126" stroke="#1a1a1a" strokeWidth="4" fill="none">` (substituí sclera + pupila) |
+| **Olho direito** | **wink** — `<path d="M 124,126 Q 150,112 176,126" stroke="#1a1a1a" strokeWidth="4" fill="none">` (substitui sclera + pupila; quando `rightEyeWink=true`, o clipPath direito não é renderizado) |
 | Bico inf. | leve sorriso fechado |
 | Head tilt | 4° |
 | Asas | `rest` bilateral |
@@ -244,6 +248,7 @@ Aplicado ao grupo `<g>` que envolve corpo + cabeça.
 | Parte | Valor |
 |-------|-------|
 | Pupilas | L `(87,126)` R `(147,126)` (levemente à esquerda) |
+| eyeLidOffset | 2 |
 | Sobrancelha E | `M 70 101 Q 90 97 110 101` (baixa e reta) |
 | Sobrancelha D | `M 130 95 Q 150 88 170 95` (elevada) |
 | Olho shape | `relaxed` (ry=22) |
