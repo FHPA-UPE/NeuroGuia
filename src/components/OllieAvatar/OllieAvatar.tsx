@@ -25,14 +25,14 @@ interface ExpressionConfig {
 }
 
 const EYE_RY: Record<EyeShape, number> = {
-  open:    26,
-  relaxed: 22,
-  squint:  20,
-  soft:    22,
-  focused: 24,
+  open:    30,
+  relaxed: 26,
+  squint:  23,
+  soft:    26,
+  focused: 28,
 }
 
-const BEAK_OPEN = 'M 100,127 Q 120,144 140,127 L 138,133 Q 120,150 102,133 Z'
+const BEAK_OPEN = 'M 100,124 Q 120,145 140,124 L 138,132 Q 120,152 102,132 Z'
 
 const STATE_LABEL: Record<AvatarState, string> = {
   neutral:     'neutro',
@@ -50,7 +50,7 @@ const EXPRESSIONS: Record<AvatarState, ExpressionConfig> = {
     rightBrow:     'M 130 98 Q 150 91 170 98',
     eyeShape:      'open',
     eyeLidOffset:  0,
-    beakPath:      'M 108,130 L 132,130 L 132,135 L 108,135 Z',
+    beakPath:      'M 108,127 L 132,127 L 132,133 L 108,133 Z',
     headTilt:      0,
     rightEyeWink:  false,
     wingRightPose: 'rest',
@@ -86,7 +86,7 @@ const EXPRESSIONS: Record<AvatarState, ExpressionConfig> = {
     rightBrow:     'M 130 103 Q 150 98 170 105',
     eyeShape:      'soft',
     eyeLidOffset:  2,
-    beakPath:      'M 110,131 Q 120,138 130,131 L 130,135 Q 120,141 110,135 Z',
+    beakPath:      'M 110,128 Q 120,137 130,128 L 130,133 Q 120,141 110,133 Z',
     headTilt:      4,
     rightEyeWink:  true,
     wingRightPose: 'rest',
@@ -98,7 +98,7 @@ const EXPRESSIONS: Record<AvatarState, ExpressionConfig> = {
     rightBrow:     'M 130 95 Q 150 88 170 95',
     eyeShape:      'relaxed',
     eyeLidOffset:  2,
-    beakPath:      'M 108,130 L 132,130 L 132,135 L 108,135 Z',
+    beakPath:      'M 108,127 L 132,127 L 132,133 L 108,133 Z',
     headTilt:      -6,
     rightEyeWink:  false,
     wingRightPose: 'raised-chin',
@@ -108,13 +108,15 @@ const EXPRESSIONS: Record<AvatarState, ExpressionConfig> = {
 function renderWingLeft(uid: string) {
   return (
     <g data-testid="ollie-wing-left">
-      <ellipse
-        cx="44" cy="198" rx="28" ry="56"
+      {/* Compact rounded wing — like a closed feather fan */}
+      <path
+        d="M 58,188 Q 30,192 28,218 Q 30,242 58,246 Q 80,244 84,224 Q 86,200 58,188 Z"
         fill={`url(#ollieWingGrad-${uid})`}
-        transform="rotate(-16, 44, 198)"
+        stroke="#5A3000" strokeWidth="1.5"
       />
-      <path d="M 34,186 Q 40,193 34,200" stroke="#4F2C00" strokeWidth="1.5" fill="none" opacity="0.55" />
-      <path d="M 28,198 Q 34,205 28,212" stroke="#4F2C00" strokeWidth="1.5" fill="none" opacity="0.55" />
+      {/* Wing feather lines */}
+      <path d="M 42,200 Q 52,210 46,224" stroke="#5A3000" strokeWidth="2" fill="none" opacity="0.55" />
+      <path d="M 34,212 Q 44,222 38,234" stroke="#5A3000" strokeWidth="2" fill="none" opacity="0.55" />
     </g>
   )
 }
@@ -155,13 +157,15 @@ function renderWingRight(pose: WingPose, uid: string) {
   }
   return (
     <g data-testid="ollie-wing-right">
-      <ellipse
-        cx="196" cy="198" rx="28" ry="56"
+      {/* Compact rounded wing — mirrored left wing */}
+      <path
+        d="M 182,188 Q 210,192 212,218 Q 210,242 182,246 Q 160,244 156,224 Q 154,200 182,188 Z"
         fill={`url(#ollieWingGrad-${uid})`}
-        transform="rotate(16, 196, 198)"
+        stroke="#5A3000" strokeWidth="1.5"
       />
-      <path d="M 206,186 Q 200,193 206,200" stroke="#4F2C00" strokeWidth="1.5" fill="none" opacity="0.55" />
-      <path d="M 212,198 Q 206,205 212,212" stroke="#4F2C00" strokeWidth="1.5" fill="none" opacity="0.55" />
+      {/* Wing feather lines */}
+      <path d="M 198,200 Q 188,210 194,224" stroke="#5A3000" strokeWidth="2" fill="none" opacity="0.55" />
+      <path d="M 206,212 Q 196,222 202,234" stroke="#5A3000" strokeWidth="2" fill="none" opacity="0.55" />
     </g>
   )
 }
@@ -192,22 +196,22 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
       >
         <defs>
           <clipPath id={`ollieLeftEyeClip-${uid}`}>
-            <ellipse cx="90" cy="126" rx="26" ry={eyeRy} />
+            <ellipse cx="90" cy="126" rx="30" ry={eyeRy} />
           </clipPath>
           <clipPath id={`ollieRightEyeClip-${uid}`}>
-            <ellipse cx="150" cy="126" rx="26" ry={eyeRy} />
+            <ellipse cx="150" cy="126" rx="30" ry={eyeRy} />
           </clipPath>
 
-          <radialGradient id={`ollieHeadGrad-${uid}`} cx="40%" cy="30%" r="65%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#F0B840" />
-            <stop offset="55%"  stopColor="#C97E18" />
-            <stop offset="100%" stopColor="#7A4A05" />
+          <radialGradient id={`ollieHeadGrad-${uid}`} cx="38%" cy="28%" r="65%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#F8CC4A" />
+            <stop offset="50%"  stopColor="#D4900A" />
+            <stop offset="100%" stopColor="#8C5206" />
           </radialGradient>
 
-          <radialGradient id={`ollieBodyGrad-${uid}`} cx="45%" cy="25%" r="70%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#EAA820" />
-            <stop offset="55%"  stopColor="#C47A14" />
-            <stop offset="100%" stopColor="#7A4A05" />
+          <radialGradient id={`ollieBodyGrad-${uid}`} cx="42%" cy="22%" r="70%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#F0B830" />
+            <stop offset="50%"  stopColor="#CB8410" />
+            <stop offset="100%" stopColor="#8A5006" />
           </radialGradient>
 
           <radialGradient id={`ollieBellyGrad-${uid}`} cx="50%" cy="35%" r="62%" gradientUnits="objectBoundingBox">
@@ -216,19 +220,20 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
             <stop offset="100%" stopColor="#DACCB0" />
           </radialGradient>
 
-          <radialGradient id={`ollieWingGrad-${uid}`} cx="50%" cy="25%" r="72%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#D98C18" />
-            <stop offset="100%" stopColor="#6B3A02" />
+          <radialGradient id={`ollieWingGrad-${uid}`} cx="40%" cy="25%" r="72%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#E09A20" />
+            <stop offset="100%" stopColor="#7A4604" />
           </radialGradient>
 
-          <radialGradient id={`ollieFaceDiscGrad-${uid}`} cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#FCE4A6" stopOpacity="0.50" />
+          <radialGradient id={`ollieFaceDiscGrad-${uid}`} cx="50%" cy="40%" r="55%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#FFFFFF" stopOpacity="0.55" />
+            <stop offset="60%"  stopColor="#FCE4A6" stopOpacity="0.20" />
             <stop offset="100%" stopColor="#FCE4A6" stopOpacity="0" />
           </radialGradient>
 
-          <radialGradient id={`ollieHatGrad-${uid}`} cx="42%" cy="20%" r="80%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#E0A020" />
-            <stop offset="55%"  stopColor="#C07818" />
+          <radialGradient id={`ollieHatGrad-${uid}`} cx="40%" cy="20%" r="80%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#EAB028" />
+            <stop offset="55%"  stopColor="#C27C14" />
             <stop offset="100%" stopColor="#8A5005" />
           </radialGradient>
 
@@ -248,45 +253,53 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
           {renderWingRight(expr.wingRightPose, uid)}
 
           {/* Body */}
-          <ellipse cx="120" cy="208" rx="80" ry="65" fill={`url(#ollieBodyGrad-${uid})`} />
+          <ellipse cx="120" cy="210" rx="84" ry="68" fill={`url(#ollieBodyGrad-${uid})`} stroke="#3D2000" strokeWidth="2" />
 
           {/* Belly */}
-          <ellipse cx="120" cy="218" rx="50" ry="58" fill={`url(#ollieBellyGrad-${uid})`} />
+          <ellipse cx="120" cy="222" rx="58" ry="62" fill={`url(#ollieBellyGrad-${uid})`} />
 
-          {/* Belly feather texture — 3 rows */}
-          <path d="M 107,198 Q 113,205 120,198" stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
-          <path d="M 120,198 Q 127,205 134,198" stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
-          <path d="M 102,210 Q 110,217 118,210" stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
-          <path d="M 122,210 Q 130,217 138,210" stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
-          <path d="M 106,222 Q 115,229 124,222" stroke="#D8D0C4" strokeWidth="1.5" fill="none" />
+          {/* Belly feather texture — 4 rows */}
+          <path d="M 106,192 Q 113,199 120,192" stroke="#C8C0B2" strokeWidth="2" fill="none" />
+          <path d="M 120,192 Q 127,199 134,192" stroke="#C8C0B2" strokeWidth="2" fill="none" />
+          <path d="M 100,204 Q 109,212 118,204" stroke="#C8C0B2" strokeWidth="2" fill="none" />
+          <path d="M 122,204 Q 131,212 140,204" stroke="#C8C0B2" strokeWidth="2" fill="none" />
+          <path d="M 104,216 Q 114,224 124,216" stroke="#C8C0B2" strokeWidth="2" fill="none" />
+          <path d="M 108,228 Q 118,236 128,228" stroke="#C8C0B2" strokeWidth="1.5" fill="none" />
 
           {/* Head group */}
           <g data-testid="ollie-head-group" transform={`rotate(${expr.headTilt}, 120, 115)`}>
 
             {/* Head circle */}
-            <circle cx="120" cy="115" r="72" fill={`url(#ollieHeadGrad-${uid})`} />
+            <circle cx="120" cy="115" r="72" fill={`url(#ollieHeadGrad-${uid})`} stroke="#3D2000" strokeWidth="2" />
+            {/* 3D highlight on upper-left of head */}
+            <ellipse cx="92" cy="78" rx="36" ry="28" fill="white" opacity="0.13" />
 
-            {/* Face disc overlay */}
-            <ellipse cx="120" cy="120" rx="58" ry="55" fill={`url(#ollieFaceDiscGrad-${uid})`} />
+            {/* Face disc — large white oval, stays inside head circle */}
+            <ellipse cx="120" cy="126" rx="64" ry="56" fill="#F5EFE2" />
+            <ellipse cx="120" cy="120" rx="62" ry="54" fill={`url(#ollieFaceDiscGrad-${uid})`} />
 
-            {/* Hat — rendered before ear tufts so tufts appear in front */}
-            <rect x="14"  y="49" width="212" height="14" rx="6"  fill={`url(#ollieHatGrad-${uid})`} />
-            <rect x="58"  y="40" width="124" height="11" rx="4"  fill="#F5F0E5" />
-            <rect x="62"  y="10" width="116" height="32" rx="7"  fill={`url(#ollieHatGrad-${uid})`} />
-            <line x1="176" y1="14" x2="205" y2="42" stroke="#7A3E00" strokeWidth="2.5" />
-            <circle data-testid="ollie-hat-tassel" cx="208" cy="45" r="9" fill="#7A3E00" />
-            <circle cx="208" cy="45" r="5" fill="#A85E08" />
+            {/* Hat — mortarboard graduation cap */}
+            {/* Hat crown top (square) */}
+            <rect x="54"  y="6"  width="132" height="38" rx="3"  fill={`url(#ollieHatGrad-${uid})`} stroke="#3D2000" strokeWidth="1.5" />
+            {/* Hat crown top highlight */}
+            <rect x="58"  y="8"  width="80"  height="10" rx="2"  fill="white" opacity="0.18" />
+            {/* Hat band - curved white strip */}
+            <rect x="50"  y="42" width="140" height="12" rx="3"  fill="#F5F0E5" stroke="#D8C890" strokeWidth="1" />
+            {/* Hat brim */}
+            <rect x="28"  y="52" width="184" height="13" rx="5"  fill={`url(#ollieHatGrad-${uid})`} stroke="#3D2000" strokeWidth="1.5" />
+            {/* Hat brim shadow */}
+            <rect x="32"  y="63" width="176" height="5"  rx="3"  fill="#3D2000" opacity="0.25" />
+            <line x1="182" y1="10" x2="208" y2="40" stroke="#6A3400" strokeWidth="2.5" />
+            <circle data-testid="ollie-hat-tassel" cx="210" cy="43" r="9" fill="#6A3400" />
+            <circle cx="210" cy="43" r="5" fill="#9A4E06" />
 
-            {/* Ear tufts — rendered after hat so they appear in front */}
-            <polygon points="60,48 48,16 76,38"  fill={`url(#ollieHeadGrad-${uid})`} />
-            <polygon points="55,48 45,20 70,36"  fill={`url(#ollieHeadGrad-${uid})`} opacity="0.85" />
-            <polygon points="65,48 52,14 80,36"  fill={`url(#ollieHeadGrad-${uid})`} opacity="0.70" />
-            <polygon points="180,48 192,16 164,38"  fill={`url(#ollieHeadGrad-${uid})`} />
-            <polygon points="185,48 195,20 170,36"  fill={`url(#ollieHeadGrad-${uid})`} opacity="0.85" />
-            <polygon points="175,48 188,14 160,36"  fill={`url(#ollieHeadGrad-${uid})`} opacity="0.70" />
+            {/* No ear tufts — reference Ollie has a smooth round head */}
+
+            {/* V-shaped forehead mark — owl's characteristic facial marking above brows */}
+            <path d="M 80,74 Q 120,94 160,74" stroke="#3D2000" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.45" />
 
             {/* Left eye sclera */}
-            <ellipse data-testid="ollie-left-eye" cx="90" cy="126" rx="26" ry={eyeRy} fill="white" />
+            <ellipse data-testid="ollie-left-eye" cx="90" cy="126" rx="30" ry={eyeRy} fill="white" />
 
             {/* Right eye — normal sclera or wink arc */}
             {expr.rightEyeWink ? (
@@ -299,7 +312,7 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
                 fill="none"
               />
             ) : (
-              <ellipse data-testid="ollie-right-eye" cx="150" cy="126" rx="26" ry={eyeRy} fill="white" />
+              <ellipse data-testid="ollie-right-eye" cx="150" cy="126" rx="30" ry={eyeRy} fill="white" />
             )}
 
             {/* Left pupil with dual specular highlights */}
@@ -319,21 +332,22 @@ export default function OllieAvatar({ avatarState, movement, beakOpen = false }:
             )}
 
             {/* Eyebrows */}
-            <path d={expr.leftBrow}  stroke="#3D2000" strokeWidth="5" strokeLinecap="round" fill="none" />
-            <path d={expr.rightBrow} stroke="#3D2000" strokeWidth="5" strokeLinecap="round" fill="none" />
+            <path d={expr.leftBrow}  stroke="#3D2000" strokeWidth="8" strokeLinecap="round" fill="none" />
+            <path d={expr.rightBrow} stroke="#3D2000" strokeWidth="8" strokeLinecap="round" fill="none" />
 
             {/* Mouth interior — visible when beak is open */}
             {isBeakOpen && (
               <ellipse
                 data-testid="ollie-mouth-interior"
-                cx="120" cy="133" rx="16" ry="8"
+                cx="120" cy="136" rx="15" ry="8"
                 fill="#CC3300"
               />
             )}
 
-            {/* Upper beak — fixed triangle */}
-            <polygon points="120,108 100,128 140,128" fill="#E8B020" />
-            <line x1="100" y1="128" x2="140" y2="128" stroke="#C8860A" strokeWidth="1.5" />
+            {/* Upper beak — compact rounded golden beak */}
+            <path d="M 106,120 Q 120,110 134,120 L 132,134 Q 120,142 108,134 Z" fill="#E8A808" stroke="#B87800" strokeWidth="1.5" strokeLinejoin="round" />
+            {/* Beak highlight */}
+            <ellipse cx="114" cy="121" rx="6" ry="4" fill="white" opacity="0.30" />
 
             {/* Lower beak */}
             <path
