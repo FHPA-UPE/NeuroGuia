@@ -9,6 +9,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader, TextLoader
 from langchain_core.documents import Document
 
+from services.config_service import read_config
+
 CHROMA_PATH = Path(__file__).parent.parent / "chroma_db"
 COLLECTION_NAME = "neuroguia"
 ALLOWED_MIME = {
@@ -18,11 +20,7 @@ ALLOWED_MIME = {
 }
 MAX_BYTES = 20 * 1024 * 1024  # 20 MB
 
-SPLITTER = RecursiveCharacterTextSplitter(
-    chunk_size=900,
-    chunk_overlap=150,
-    separators=["\n\n", "\n", "Art.", "§", ". ", " "],
-)
+_CHUNK_SEPARATORS = ["\n\n", "\n", "Art.", "§", ". ", " "]
 
 
 def get_chroma_collection() -> chromadb.Collection:
@@ -40,6 +38,15 @@ def is_duplicate(source_id: str, collection: chromadb.Collection) -> bool:
 
 
 def load_and_chunk(path: Path, source_id: str) -> list[Document]:
+    cfg = read_config()
+    chunk_size = cfg.get("rag_chunk_size", 900)
+    chunk_overlap = round(chunk_size * 0.17)
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=_CHUNK_SEPARATORS,
+    )
+
     suffix = path.suffix.lower()
     if suffix == ".pdf":
         loader = PyMuPDFLoader(str(path))
@@ -47,13 +54,12 @@ def load_and_chunk(path: Path, source_id: str) -> list[Document]:
         loader = TextLoader(str(path), encoding="utf-8")
     elif suffix == ".docx":
         from langchain_community.document_loaders import Docx2txtLoader
-
         loader = Docx2txtLoader(str(path))
     else:
         raise ValueError(f"Tipo não suportado: {suffix}")
 
     docs = loader.load()
-    chunks = SPLITTER.split_documents(docs)
+    chunks = splitter.split_documents(docs)
     for chunk in chunks:
         chunk.metadata["source"] = path.name
         chunk.metadata["source_id"] = source_id

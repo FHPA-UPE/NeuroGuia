@@ -49,3 +49,23 @@ def test_is_duplicate_true_for_existing(tmp_path):
     col = client.get_or_create_collection("test")
     col.add(ids=["doc1"], documents=["text"], metadatas=[{"source_id": "sha256abc"}])
     assert is_duplicate("sha256abc", col)
+
+
+def test_load_and_chunk_uses_chunk_size_from_config(txt_file):
+    from unittest.mock import patch, MagicMock
+    from services import ingest_service
+
+    with patch("services.ingest_service.read_config", return_value={"rag_chunk_size": 600}), \
+         patch("services.ingest_service.RecursiveCharacterTextSplitter") as mock_splitter_cls:
+
+        mock_splitter = MagicMock()
+        mock_splitter.split_documents.return_value = []
+        mock_splitter_cls.return_value = mock_splitter
+
+        ingest_service.load_and_chunk(txt_file, "abc")
+
+    mock_splitter_cls.assert_called_once_with(
+        chunk_size=600,
+        chunk_overlap=round(600 * 0.17),
+        separators=["\n\n", "\n", "Art.", "§", ". ", " "],
+    )
