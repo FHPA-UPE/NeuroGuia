@@ -40,19 +40,26 @@ async def call_llm_stream(messages: list[dict]):
     cfg = read_config()
     provider = cfg.get("llm_provider", "anthropic")
     model = cfg.get("llm_model", "claude-haiku-4-5-20251001")
+    temperature = cfg.get("llm_temperature", 0.3)
+    max_tokens = cfg.get("llm_max_tokens", None)
     # litellm uses "gemini/" prefix for the Gemini API; "google" maps to VertexAI
     litellm_prefix = "gemini" if provider == "google" else provider
     litellm_model = f"{litellm_prefix}/{model}"
     api_key = _get_key(f'{provider.upper()}_API_KEY')
 
-    response = await litellm.acompletion(
-        model=litellm_model,
-        messages=messages,
-        temperature=0.3,
-        timeout=30,
-        stream=True,
-        **({"api_key": api_key} if api_key else {}),
-    )
+    kwargs: dict = {
+        "model": litellm_model,
+        "messages": messages,
+        "temperature": temperature,
+        "timeout": 30,
+        "stream": True,
+    }
+    if max_tokens:
+        kwargs["max_tokens"] = max_tokens
+    if api_key:
+        kwargs["api_key"] = api_key
+
+    response = await litellm.acompletion(**kwargs)
     async for chunk in response:
         delta = chunk.choices[0].delta
         if delta and delta.content:
