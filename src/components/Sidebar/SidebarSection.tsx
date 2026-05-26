@@ -13,6 +13,7 @@ export function SidebarSection({ title, id, children, collapsed, onToggle }: Sid
   return (
     <div className="border-b border-mist">
       <button
+        id={`${id}-header`}
         type="button"
         onClick={onToggle}
         aria-expanded={!collapsed}
@@ -34,7 +35,10 @@ export function SidebarSection({ title, id, children, collapsed, onToggle }: Sid
 
       <div
         id={`${id}-content`}
-        className={`overflow-hidden transition-all duration-200 ${collapsed ? 'max-h-0' : 'max-h-96'}`}
+        role="region"
+        aria-labelledby={`${id}-header`}
+        inert={collapsed || undefined}
+        className={`overflow-hidden transition-[max-height] duration-200 ${collapsed ? 'max-h-0' : 'max-h-[1000px]'}`}
       >
         <div className="px-4 py-3 flex flex-col gap-2">
           {children}
