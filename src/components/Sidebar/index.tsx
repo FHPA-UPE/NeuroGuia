@@ -177,7 +177,7 @@ export function Sidebar({
       {/* ── Desktop sidebar (md and above) ──────────────────────────────── */}
       <aside
         aria-label="Painel de controle"
-        className="hidden md:flex flex-col w-[200px] shrink-0 border-r border-mist bg-cream-card h-[calc(100vh-64px)] sticky top-[64px] overflow-hidden"
+        className="hidden md:flex flex-col w-[200px] shrink-0 border-r border-mist bg-cream-card h-[calc(100vh-64px)] sticky top-[64px]"
       >
         <SidebarContent {...contentProps} />
       </aside>
@@ -220,7 +220,7 @@ export function Sidebar({
           {/* Drawer panel */}
           <aside
             aria-label="Painel de controle"
-            className="md:hidden fixed left-0 top-[64px] z-50 flex flex-col w-[260px] bg-cream-card border-r border-mist h-[calc(100vh-64px)] shadow-xl"
+            className="md:hidden fixed left-0 top-[64px] z-50 flex flex-col w-[260px] bg-cream-card border-r border-mist h-[calc(100vh-64px)] shadow-xl overflow-hidden"
           >
             {/* Drawer header with close button */}
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-mist shrink-0">
