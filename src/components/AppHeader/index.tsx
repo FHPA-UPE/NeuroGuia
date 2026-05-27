@@ -51,7 +51,7 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
       <nav className="ml-auto flex items-center gap-3 text-sm" aria-label="Navegação principal">
         {mounted && (
           <>
-            {isAdmin && (isChatPage || isAdminPage) && (
+            {isAdmin && isChatPage && (
               <>
                 <Link
                   href="/ingest"
@@ -67,7 +67,7 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
                 </Link>
               </>
             )}
-            {user?.role === 'admin' && (isChatPage || isAdminPage) && (
+            {user?.role === 'admin' && isChatPage && (
               <Link
                 href="/config"
                 className={`text-sm hover:underline ${pathname === '/config' ? 'text-ink font-semibold' : 'text-violet'}`}
@@ -92,7 +92,7 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
           <>
             <span aria-hidden="true" className="w-px h-5 bg-mist shrink-0" />
             <span
-              aria-label={`Usuário logado: ${user.username}`}
+              aria-label={`Usuário: ${user.username}`}
               role="status"
               className="flex items-center gap-1.5 select-none"
             >

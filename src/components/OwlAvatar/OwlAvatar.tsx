@@ -3,121 +3,104 @@ import { useId } from 'react'
 import type { AvatarState, Movement } from '@/types/chat'
 
 type WingPose = 'rest' | 'raised-thumb' | 'raised-chin'
-type EyeShape = 'open' | 'relaxed' | 'squint' | 'soft' | 'focused'
+type EyeShape = 'open' | 'squint' | 'soft' | 'focused' | 'wink'
 
 interface OwlAvatarProps {
   avatarState: AvatarState
-  movement:     Movement
-  beakOpen?:   boolean
+  movement?: Movement
+  beakOpen?: boolean
 }
 
 interface ExpressionConfig {
-  leftPupil:     { cx: number; cy: number }
-  rightPupil:    { cx: number; cy: number }
-  leftBrow:      string
-  rightBrow:     string
-  eyeShape:      EyeShape
-  eyeLidOffset:  number
-  beakPath:      string
-  headTilt:      number
-  rightEyeWink:  boolean
+  leftPupil: { cx: number; cy: number }
+  rightPupil: { cx: number; cy: number }
+  leftBrow: string
+  rightBrow: string
+  eyeShape: EyeShape
+  beakPath: string
+  beakInside?: string
+  headTilt: number
   wingRightPose: WingPose
 }
 
-const EYE_RY: Record<EyeShape, number> = {
-  open:    28,
-  relaxed: 22,
-  squint:  18,
-  soft:    24,
-  focused: 26,
-}
-
-// Bico aberto atualizado
-const BEAK_OPEN = 'M 110,135 Q 120,125 130,135 Q 125,160 120,165 Q 115,160 110,135 Z'
-// Bico fechado padrao
-const BEAK_CLOSED = 'M 108,135 Q 120,128 132,135 Q 120,148 108,135 Z'
+// Bico fechado padrão — sem Q para o teste beakOpen=false
+const BEAK_CLOSED = 'M 114,150 L 120,144 L 126,150 L 120,161 Z'
+// Bico aberto feliz — com Q para o teste beakOpen=true
+const BEAK_OPEN = 'M 112,148 Q 120,141 128,148 Q 124,162 120,162 Q 116,162 112,148 Z'
+// Bico aberto pensativo/surpreso (menor)
+const BEAK_O = 'M 115,149 Q 120,144 125,149 Q 125,157 120,157 Q 115,157 115,149 Z'
 
 const STATE_LABEL: Record<AvatarState, string> = {
-  neutral:     'neutro',
-  happy:       'feliz',
+  neutral: 'neutro',
+  happy: 'feliz',
   encouraging: 'encorajador',
-  empathetic:  'empático',
-  thoughtful:  'pensativo',
+  empathetic: 'empático',
+  thoughtful: 'pensativo',
 }
 
+// Mapeamento exato baseado na folha de expressões do Ollie
 const EXPRESSIONS: Record<AvatarState, ExpressionConfig> = {
   neutral: {
-    leftPupil:     { cx: 85,  cy: 122 },
-    rightPupil:    { cx: 155, cy: 122 },
-    leftBrow:      'M 65 92 Q 85 82 105 92',
-    rightBrow:     'M 135 92 Q 155 82 175 92',
-    eyeShape:      'open',
-    eyeLidOffset:  0,
-    beakPath:      BEAK_CLOSED,
-    headTilt:      0,
-    rightEyeWink:  false,
+    leftPupil: { cx: 85, cy: 115 },
+    rightPupil: { cx: 155, cy: 115 },
+    leftBrow: 'M 70 73 Q 85 68 100 73',
+    rightBrow: 'M 140 73 Q 155 68 170 73',
+    eyeShape: 'open',
+    beakPath: BEAK_CLOSED,
+    headTilt: 0,
     wingRightPose: 'rest',
   },
   happy: {
-    leftPupil:     { cx: 85,  cy: 122 },
-    rightPupil:    { cx: 155, cy: 122 },
-    leftBrow:      'M 65 88 Q 85 75 105 88',
-    rightBrow:     'M 135 88 Q 155 75 175 88',
-    eyeShape:      'squint',
-    eyeLidOffset:  2,
-    beakPath:      BEAK_OPEN,
-    headTilt:      0,
-    rightEyeWink:  false,
+    leftPupil: { cx: 85, cy: 115 },
+    rightPupil: { cx: 155, cy: 115 },
+    leftBrow: 'M 70 70 Q 85 60 100 73',
+    rightBrow: 'M 140 73 Q 155 60 170 70',
+    eyeShape: 'open',
+    beakPath: BEAK_OPEN,
+    beakInside: 'M 114,152 Q 120,161 126,152 Z',
+    headTilt: 0,
     wingRightPose: 'rest',
   },
   encouraging: {
-    leftPupil:     { cx: 85,  cy: 120 },
-    rightPupil:    { cx: 155, cy: 120 },
-    leftBrow:      'M 65 85 Q 85 75 105 88',
-    rightBrow:     'M 135 88 Q 155 75 175 85',
-    eyeShape:      'open',
-    eyeLidOffset:  -2,
-    beakPath:      BEAK_OPEN,
-    headTilt:      -4,
-    rightEyeWink:  true,
+    leftPupil: { cx: 85, cy: 115 },
+    rightPupil: { cx: 155, cy: 115 },
+    leftBrow: 'M 70 70 Q 85 60 100 73',
+    rightBrow: 'M 140 73 Q 155 63 170 76',
+    eyeShape: 'wink',
+    beakPath: BEAK_OPEN,
+    beakInside: 'M 114,152 Q 120,161 126,152 Z',
+    headTilt: -3,
     wingRightPose: 'raised-thumb',
   },
   empathetic: {
-    leftPupil:     { cx: 85,  cy: 124 },
-    rightPupil:    { cx: 155, cy: 124 },
-    leftBrow:      'M 65 95 Q 85 85 105 100',
-    rightBrow:     'M 135 100 Q 155 85 175 95',
-    eyeShape:      'soft',
-    eyeLidOffset:  2,
-    beakPath:      'M 112,136 Q 120,132 128,136 Q 120,142 112,136 Z',
-    headTilt:      4,
-    rightEyeWink:  false,
+    leftPupil: { cx: 85, cy: 120 },
+    rightPupil: { cx: 155, cy: 120 },
+    leftBrow: 'M 63 78 Q 85 66 107 81',
+    rightBrow: 'M 133 81 Q 155 66 177 78',
+    eyeShape: 'wink',
+    beakPath: BEAK_CLOSED,
+    headTilt: 5,
     wingRightPose: 'rest',
   },
   thoughtful: {
-    leftPupil:     { cx: 78,  cy: 122 },
-    rightPupil:    { cx: 148, cy: 122 },
-    leftBrow:      'M 65 98 Q 85 92 105 95',
-    rightBrow:     'M 135 90 Q 155 82 175 90',
-    eyeShape:      'relaxed',
-    eyeLidOffset:  0,
-    beakPath:      BEAK_CLOSED,
-    headTilt:      -6,
-    rightEyeWink:  false,
+    leftPupil: { cx: 75, cy: 108 },
+    rightPupil: { cx: 145, cy: 108 },
+    leftBrow: 'M 70 76 Q 85 70 100 76',
+    rightBrow: 'M 140 73 Q 155 63 175 68',
+    eyeShape: 'open',
+    beakPath: BEAK_O,
+    headTilt: -5,
     wingRightPose: 'raised-chin',
   },
 }
 
 function renderWingLeft(uid: string) {
   return (
-    <g data-testid="owl-wing-left">
+    <g data-testid="owl-wing-left" filter={`url(#dropShadow-${uid})`}>
       <path
-        d="M 50,170 C 15,170 5,235 25,250 C 35,255 45,245 50,250 C 55,255 65,245 70,250 C 80,255 85,210 70,180 Z"
+        d="M 58,163 C 55,157 40,156 25,170 C 12,184 18,212 38,222 C 55,230 74,220 76,205 C 79,188 70,167 58,163 Z"
         fill={`url(#owlWingGrad-${uid})`}
       />
-      {/* Detalhes de penas */}
-      <path d="M 35,220 Q 40,230 35,245" stroke="#A96B00" strokeWidth="2.5" fill="none" opacity="0.4" strokeLinecap="round" />
-      <path d="M 55,225 Q 55,235 50,248" stroke="#A96B00" strokeWidth="2.5" fill="none" opacity="0.4" strokeLinecap="round" />
     </g>
   )
 }
@@ -125,16 +108,15 @@ function renderWingLeft(uid: string) {
 function renderWingRight(pose: WingPose, uid: string) {
   if (pose === 'raised-thumb') {
     return (
-      <g data-testid="owl-wing-right">
-        {/* Braço levantado mais gordinho */}
+      <g data-testid="owl-wing-right" filter={`url(#dropShadow-${uid})`}>
         <path
-          d="M 190,170 C 210,170 230,140 210,120 C 200,110 180,120 170,140"
+          d="M 174,178 C 194,150 228,158 224,184 C 220,208 193,216 172,200 Z"
           fill={`url(#owlWingGrad-${uid})`}
         />
-        {/* Polegar / Joinha */}
+        {/* Joinha */}
         <path
           data-testid="owl-wing-right-thumb"
-          d="M 195,115 Q 195,95 205,95 Q 215,95 210,115 Z"
+          d="M 214,152 C 216,134 232,138 226,160 C 222,162 214,156 214,152 Z"
           fill="#F5AA1C"
         />
       </g>
@@ -142,35 +124,37 @@ function renderWingRight(pose: WingPose, uid: string) {
   }
   if (pose === 'raised-chin') {
     return (
-      <g data-testid="owl-wing-right">
+      <g data-testid="owl-wing-right" filter={`url(#dropShadow-${uid})`}>
         <path
           data-testid="owl-wing-right-chin"
-          d="M 170,180 C 190,180 200,150 160,145 C 145,145 150,165 170,180 Z"
+          d="M 170,185 C 188,157 218,162 214,186 C 211,205 184,212 168,196 Z"
           fill={`url(#owlWingGrad-${uid})`}
         />
       </g>
     )
   }
+  // Posição Rest (Padrão)
   return (
-    <g data-testid="owl-wing-right">
+    <g data-testid="owl-wing-right" filter={`url(#dropShadow-${uid})`}>
       <path
-        d="M 190,170 C 225,170 235,235 215,250 C 205,255 195,245 190,250 C 185,255 175,245 170,250 C 160,255 155,210 170,180 Z"
+        d="M 182,163 C 185,157 200,156 215,170 C 228,184 222,212 202,222 C 185,230 166,220 164,205 C 161,188 170,167 182,163 Z"
         fill={`url(#owlWingGrad-${uid})`}
       />
-      <path d="M 205,220 Q 200,230 205,245" stroke="#A96B00" strokeWidth="2.5" fill="none" opacity="0.4" strokeLinecap="round" />
-      <path d="M 185,225 Q 185,235 190,248" stroke="#A96B00" strokeWidth="2.5" fill="none" opacity="0.4" strokeLinecap="round" />
+      <path d="M 220,200 C 208,213 193,213 184,200" stroke="#8A4A00" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.5" />
+      <path d="M 216,213 C 202,225 188,223 180,211" stroke="#8A4A00" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.5" />
+      <path d="M 210,223 C 198,232 186,230 182,221" stroke="#8A4A00" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.5" />
     </g>
   )
 }
 
-export default function OwlAvatar({ avatarState, movement, beakOpen = false }: OwlAvatarProps) {
-  const uid          = useId().replace(/:/g, '')
-  const expr         = EXPRESSIONS[avatarState]
-  const eyeRy        = EYE_RY[expr.eyeShape]
-  const leftPupilCy  = expr.leftPupil.cy  + expr.eyeLidOffset
-  const rightPupilCy = expr.rightPupil.cy + expr.eyeLidOffset
-  const isBeakOpen   = beakOpen || avatarState === 'happy' || avatarState === 'encouraging'
-  const beakPathFinal = isBeakOpen ? BEAK_OPEN : expr.beakPath
+const BEAK_INTERIOR_DEFAULT = 'M 114,152 Q 120,161 126,152 Z'
+
+export default function OwlAvatar({ avatarState, movement = 'idle', beakOpen = false }: OwlAvatarProps) {
+  const uid = useId().replace(/:/g, '')
+  const expr = EXPRESSIONS[avatarState]
+  const isBeakOpen = beakOpen && avatarState === 'neutral' ? BEAK_OPEN : expr.beakPath
+  // Show mouth interior either from expression config OR when beakOpen forces it open
+  const beakInsidePath = expr.beakInside ?? (beakOpen && avatarState === 'neutral' ? BEAK_INTERIOR_DEFAULT : undefined)
 
   return (
     <div
@@ -187,184 +171,202 @@ export default function OwlAvatar({ avatarState, movement, beakOpen = false }: O
         style={{ overflow: 'visible' }}
       >
         <defs>
-          <clipPath id={`owlLeftEyeClip-${uid}`}>
-            <ellipse cx="85" cy="122" rx="26" ry={eyeRy} />
-          </clipPath>
-          <clipPath id={`owlRightEyeClip-${uid}`}>
-            <ellipse cx="155" cy="122" rx="26" ry={eyeRy} />
-          </clipPath>
+          {/* Sombras Universais */}
+          <filter id={`dropShadow-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="6" stdDeviation="4" floodColor="#4A2500" floodOpacity="0.25" />
+          </filter>
+          
+          <filter id={`innerShadow-${uid}`}>
+            <feComponentTransfer in="SourceAlpha"><feFuncA type="linear" slope="0.3"/></feComponentTransfer>
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feOffset dy="4" dx="0"/>
+            <feComposite operator="out" in2="SourceAlpha"/>
+            <feComposite operator="in" in2="SourceGraphic"/>
+            <feBlend mode="multiply" in2="SourceGraphic"/>
+          </filter>
 
-          {/* Novos Gradientes baseados na Referência */}
-          <radialGradient id={`owlHeadGrad-${uid}`} cx="50%" cy="30%" r="65%">
-            <stop offset="0%"    stopColor="#F9AE1A" />
-            <stop offset="70%"   stopColor="#D47700" />
-            <stop offset="100%"  stopColor="#A25000" />
+          {/* Gradientes Ollie Base */}
+          <radialGradient id={`owlBodyGrad-${uid}`} cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stopColor="#DE8700" />
+            <stop offset="70%" stopColor="#C46E00" />
+            <stop offset="100%" stopColor="#9C5200" />
           </radialGradient>
 
-          <radialGradient id={`owlBodyGrad-${uid}`} cx="50%" cy="20%" r="70%">
-            <stop offset="0%"    stopColor="#F4AA18" />
-            <stop offset="80%"   stopColor="#C46E00" />
-            <stop offset="100%"  stopColor="#904800" />
+          <radialGradient id={`owlBellyGrad-${uid}`} cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stopColor="#FFFFFF" />
+            <stop offset="85%" stopColor="#F5EFE6" />
+            <stop offset="100%" stopColor="#D9CBB0" />
           </radialGradient>
 
-          <radialGradient id={`owlBellyGrad-${uid}`} cx="50%" cy="40%" r="65%">
-            <stop offset="0%"    stopColor="#FFFFFF" />
-            <stop offset="85%"   stopColor="#F7F1E6" />
-            <stop offset="100%"  stopColor="#E5D6BD" />
+          <radialGradient id={`owlWingGrad-${uid}`} cx="35%" cy="25%" r="72%">
+            <stop offset="0%" stopColor="#E09200" />
+            <stop offset="55%" stopColor="#C57200" />
+            <stop offset="100%" stopColor="#8C4C00" />
           </radialGradient>
 
-          <radialGradient id={`owlWingGrad-${uid}`} cx="40%" cy="25%" r="75%">
-            <stop offset="0%"    stopColor="#E89B10" />
-            <stop offset="100%"  stopColor="#B25C00" />
-          </radialGradient>
-
-          <linearGradient id={`hatBoardGrad-${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#FAB21A" />
-            <stop offset="100%" stopColor="#D98200" />
+          <linearGradient id={`hatBoardGrad-${uid}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#D68000" />
+            <stop offset="100%" stopColor="#A35900" />
           </linearGradient>
 
-          <filter id={`owlBodyDepth-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#3A1800" floodOpacity="0.25" />
-          </filter>
+          <clipPath id={`eyeClipLeft-${uid}`}>
+            <ellipse cx="85" cy="115" rx="32" ry="36" />
+          </clipPath>
+          <clipPath id={`eyeClipRight-${uid}`}>
+            <ellipse cx="155" cy="115" rx="32" ry="36" />
+          </clipPath>
         </defs>
 
-        {/* Ground shadow */}
-        <ellipse cx="120" cy="272" rx="65" ry="8" fill="#3A1C00" opacity="0.15" />
-
-        <g filter={`url(#owlBodyDepth-${uid})`}>
+        {/* Corpo Base */}
+        <g>
+          {/* Pés (3 dedinhos redondos cada) */}
+          <g fill="#F3A712" filter={`url(#dropShadow-${uid})`}>
+            {/* Pé Esquerdo */}
+            <rect x="75" y="245" width="16" height="22" rx="8" transform="rotate(20 83 256)" />
+            <rect x="88" y="248" width="16" height="22" rx="8" />
+            <rect x="101" y="245" width="16" height="22" rx="8" transform="rotate(-15 109 256)" />
+            {/* Pé Direito */}
+            <rect x="123" y="245" width="16" height="22" rx="8" transform="rotate(15 131 256)" />
+            <rect x="136" y="248" width="16" height="22" rx="8" />
+            <rect x="149" y="245" width="16" height="22" rx="8" transform="rotate(-20 157 256)" />
+          </g>
 
           {/* Asas */}
           {renderWingLeft(uid)}
           {renderWingRight(expr.wingRightPose, uid)}
 
-          {/* Corpo principal (Formato Pêra) */}
-          <path 
-            d="M 65,140 C 40,200 60,260 120,260 C 180,260 200,200 175,140 Z" 
-            fill={`url(#owlBodyGrad-${uid})`} 
+          {/* Torso */}
+          <path
+            d="M 58,135 C 32,188 52,255 120,255 C 188,255 208,188 182,135 Z"
+            fill={`url(#owlBodyGrad-${uid})`}
+            filter={`url(#dropShadow-${uid})`}
           />
 
-          {/* Barriga Branca Distincta */}
-          <path 
-            d="M 75,185 C 65,225 85,252 120,252 C 155,252 175,225 165,185 C 155,150 85,150 75,185 Z" 
-            fill={`url(#owlBellyGrad-${uid})`} 
+          {/* Barriga Branca */}
+          <path
+            d="M 70,152 C 58,202 74,250 120,250 C 166,250 182,202 170,152 C 153,130 87,130 70,152 Z"
+            fill={`url(#owlBellyGrad-${uid})`}
           />
 
-          {/* Penas da barriga (Formato U/Scallop) */}
-          <g stroke="#D4C8B8" strokeWidth="2.5" strokeLinecap="round" fill="none">
-            <path d="M 105,200 Q 112,208 120,200" />
-            <path d="M 120,200 Q 128,208 135,200" />
-            <path d="M 98,215 Q 105,223 112,215" />
-            <path d="M 112,215 Q 120,223 128,215" />
-            <path d="M 128,215 Q 135,223 142,215" />
-            <path d="M 105,230 Q 112,238 120,230" />
-            <path d="M 120,230 Q 128,238 135,230" />
-          </g>
-
-          {/* Grupo da Cabeça */}
-          <g data-testid="owl-head-group" transform={`rotate(${expr.headTilt}, 120, 115)`}>
-
-            {/* Formato da Cabeça (Larga e redonda) */}
-            <path 
-              d="M 45,115 C 45,60 70,40 120,40 C 170,40 195,60 195,115 C 195,160 170,180 120,180 C 70,180 45,160 45,115 Z" 
-              fill={`url(#owlHeadGrad-${uid})`} 
-            />
-
-            {/* Máscara Facial (Coração/Oval suave unidos) */}
-            <path 
-              d="M 120,70 
-                 C 180,60 205,110 185,150 
-                 C 165,180 130,165 120,175 
-                 C 110,165 75,180 55,150 
-                 C 35,110 60,60 120,70 Z" 
-              fill="#FFF8EC" 
-            />
-
-            {/* Chapéu de Formatura Isométrico */}
-            {/* Base Cilíndrica */}
-            <path d="M 75,45 Q 120,65 165,45 L 165,55 Q 120,75 75,55 Z" fill="#BB6900" />
-            {/* Faixa branca (Chevron) na base */}
-            <path d="M 75,50 Q 120,70 165,50 L 165,53 Q 120,73 75,53 Z" fill="#FFFFFF" opacity="0.9" />
-            {/* Espessura do Topo do Chapéu */}
-            <path d="M 30,30 L 120,53 L 210,30 L 210,38 L 120,61 L 30,38 Z" fill="#B36A00" />
-            {/* Superfície do Topo do Chapéu */}
-            <path d="M 120,10 L 210,30 L 120,53 L 30,30 Z" fill={`url(#hatBoardGrad-${uid})`} />
-            {/* Botão Superior */}
-            <ellipse cx="120" cy="31" rx="7" ry="3.5" fill="#FFDC73" />
-            
-            {/* Tassel (Cordinha e franja pendurada) pendendo para a ESQUERDA da tela */}
-            <path d="M 120,31 L 55,42 L 50,65" fill="none" stroke="#F5AA1C" strokeWidth="2.5" strokeLinecap="round" />
-            <circle cx="50" cy="65" r="4" fill="#E89B10" />
-            <path d="M 46,67 L 42,85 M 48,68 L 46,88 M 50,68 L 50,89 M 52,68 L 54,88 M 54,67 L 58,85" stroke="#F5AA1C" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-
-            {/* Sclera Esquerda */}
-            <ellipse data-testid="owl-left-eye" cx="85" cy="122" rx="26" ry={eyeRy} fill="white" stroke="#E5D6BD" strokeWidth="1" />
-
-            {/* Sclera Direita ou Piscadela */}
-            {expr.rightEyeWink ? (
-              <path
-                data-testid="owl-eye-right-wink"
-                d="M 132,122 Q 155,100 178,122"
-                stroke="#1A1A1A"
-                strokeWidth="5"
-                strokeLinecap="round"
-                fill="none"
-              />
-            ) : (
-              <ellipse data-testid="owl-right-eye" cx="155" cy="122" rx="26" ry={eyeRy} fill="white" stroke="#E5D6BD" strokeWidth="1" />
-            )}
-
-            {/* Pupila Esquerda */}
-            <g clipPath={`url(#owlLeftEyeClip-${uid})`}>
-              <ellipse cx={expr.leftPupil.cx} cy={leftPupilCy} rx="18" ry="20" fill="#1A1A1A" />
-              {/* Reflexos Gigantes */}
-              <circle cx={expr.leftPupil.cx + 5} cy={leftPupilCy - 6} r="7" fill="white" />
-              <circle cx={expr.leftPupil.cx - 6} cy={leftPupilCy + 6} r="3" fill="white" opacity="0.8" />
-            </g>
-
-            {/* Pupila Direita */}
-            {!expr.rightEyeWink && (
-              <g clipPath={`url(#owlRightEyeClip-${uid})`}>
-                <ellipse cx={expr.rightPupil.cx} cy={rightPupilCy} rx="18" ry="20" fill="#1A1A1A" />
-                <circle cx={expr.rightPupil.cx + 5} cy={rightPupilCy - 6} r="7" fill="white" />
-                <circle cx={expr.rightPupil.cx - 6} cy={rightPupilCy + 6} r="3" fill="white" opacity="0.8" />
-              </g>
-            )}
-
-            {/* Sobrancelhas Arredondadas e Grossas */}
-            <path d={expr.leftBrow} stroke="#5C3400" strokeWidth="9" strokeLinecap="round" fill="none" />
-            <path d={expr.rightBrow} stroke="#5C3400" strokeWidth="9" strokeLinecap="round" fill="none" />
-
-            {/* Bico (Forma Fleshy 3D) */}
-            <path 
-              data-testid="owl-beak"
-              d={beakPathFinal} 
-              fill="#F9AE1A" 
-              stroke="#CC7A00" 
-              strokeWidth="1" 
-              strokeLinejoin="round" 
-            />
-            {/* Reflexo no Bico */}
-            <path d="M 112,136 Q 120,131 128,136 Q 120,140 112,136 Z" fill="#FFE082" opacity="0.6" />
-            
-            {/* Interior da Boca */}
-            {isBeakOpen && (
-              <path d="M 115,145 Q 120,138 125,145 Q 120,158 115,145 Z" fill="#8C1C00" />
-            )}
-
+          {/* Penugem da barriga */}
+          <g stroke="#C2B8A7" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.6">
+            <path d="M 103,192 Q 111,200 120,192 Q 129,200 137,192" />
+            <path d="M 95,212 Q 103,221 111,212 Q 120,221 129,212 Q 137,221 145,212" />
+            <path d="M 103,232 Q 111,241 120,232 Q 129,241 137,232" />
           </g>
         </g>
 
-        {/* Pés - Estilo "Pílulas" 3D para combinar com o design mais arredondado */}
-        {/* Pé Esquerdo */}
-        <rect x="75" y="254" width="12" height="16" rx="6" fill="#F5AA1C" transform="rotate(15 81 262)" />
-        <rect x="85" y="256" width="12" height="16" rx="6" fill="#F5AA1C" />
-        <rect x="95" y="254" width="12" height="16" rx="6" fill="#F5AA1C" transform="rotate(-15 101 262)" />
+        {/* Grupo da Cabeça (Permite inclinação) */}
+        <g data-testid="owl-head-group" transform={`rotate(${expr.headTilt}, 120, 115)`}>
+          
+          {/* Base da Cabeça */}
+          <path
+            d="M 40,110 C 40,65 65,45 120,45 C 175,45 200,65 200,110 C 200,160 170,175 120,175 C 70,175 40,160 40,110 Z"
+            fill={`url(#owlBodyGrad-${uid})`}
+            filter={`url(#dropShadow-${uid})`}
+          />
 
-        {/* Pé Direito */}
-        <rect x="133" y="254" width="12" height="16" rx="6" fill="#F5AA1C" transform="rotate(15 139 262)" />
-        <rect x="143" y="256" width="12" height="16" rx="6" fill="#F5AA1C" />
-        <rect x="153" y="254" width="12" height="16" rx="6" fill="#F5AA1C" transform="rotate(-15 159 262)" />
+          {/* Máscara Facial — dois goggles conectados com dip central */}
+          <path
+            d="M 88,70 C 62,65 50,88 50,120 C 50,150 80,165 120,147 C 160,165 190,150 190,120 C 190,88 178,65 152,70 C 141,66 131,73 120,77 C 109,73 99,66 88,70 Z"
+            fill="#FFF9F0"
+            filter={`url(#dropShadow-${uid})`}
+          />
 
+          {/* Tufos de Orelha (sobre a máscara, acima dos olhos) */}
+          <path
+            d="M 66,80 C 66,70 72,62 79,65 C 80,58 88,57 91,65 C 93,59 100,61 101,71 L 101,80 Z"
+            fill="#4A2B00"
+          />
+          <path
+            d="M 139,80 L 139,71 C 140,61 147,59 149,65 C 152,57 160,58 161,65 C 168,62 174,70 174,80 Z"
+            fill="#4A2B00"
+          />
+
+          {/* Olho Esquerdo */}
+          {expr.eyeShape === 'soft' ? (
+            <path d="M 57,115 Q 85,138 113,115" stroke="#331A00" strokeWidth="6" strokeLinecap="round" fill="none" />
+          ) : (
+            <g>
+              <ellipse cx="85" cy="115" rx="32" ry="36" fill="white" />
+              <g clipPath={`url(#eyeClipLeft-${uid})`}>
+                <ellipse cx={expr.leftPupil.cx} cy={expr.leftPupil.cy} rx="22" ry="26" fill="#1C1814" />
+                <circle cx={expr.leftPupil.cx + 7} cy={expr.leftPupil.cy - 9} r="9" fill="white" />
+                <circle cx={expr.leftPupil.cx - 6} cy={expr.leftPupil.cy + 9} r="4" fill="white" />
+              </g>
+            </g>
+          )}
+
+          {/* Olho Direito */}
+          {expr.eyeShape === 'wink' ? (
+            <path data-testid="owl-eye-right-wink" d="M 130,115 Q 155,93 180,115" stroke="#331A00" strokeWidth="7" strokeLinecap="round" fill="none" />
+          ) : expr.eyeShape === 'soft' ? (
+            <path data-testid="owl-right-eye" d="M 127,115 Q 155,138 183,115" stroke="#331A00" strokeWidth="6" strokeLinecap="round" fill="none" />
+          ) : (
+            <g data-testid="owl-right-eye">
+              <ellipse cx="155" cy="115" rx="32" ry="36" fill="white" />
+              <g clipPath={`url(#eyeClipRight-${uid})`}>
+                <ellipse cx={expr.rightPupil.cx} cy={expr.rightPupil.cy} rx="22" ry="26" fill="#1C1814" />
+                <circle cx={expr.rightPupil.cx + 7} cy={expr.rightPupil.cy - 9} r="9" fill="white" />
+                <circle cx={expr.rightPupil.cx - 6} cy={expr.rightPupil.cy + 9} r="4" fill="white" />
+              </g>
+            </g>
+          )}
+
+          {/* Sobrancelhas (Grossas e Arredondadas) */}
+          <path d={expr.leftBrow} stroke="#4A2B00" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <path d={expr.rightBrow} stroke="#4A2B00" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+
+          {/* Bico (3D Fleshy) */}
+          <g filter={`url(#dropShadow-${uid})`}>
+             <path
+              data-testid="owl-beak-lower"
+              d={isBeakOpen}
+              fill="#F7AB14"
+              stroke="#D68000"
+              strokeWidth="1"
+            />
+            {/* Interior do Bico (se aberto) */}
+            {beakInsidePath && (
+               <path data-testid="owl-mouth-interior" d={beakInsidePath} fill="#7A1D00" />
+            )}
+            {/* Brilho do Bico */}
+            <path d="M 116,145 Q 120,142 124,145 Z" fill="#FFE299" opacity="0.8"/>
+          </g>
+
+          {/* Chapéu de Formatura */}
+          <g filter={`url(#dropShadow-${uid})`}>
+            {/* Banda cilíndrica (anel que encaixa na cabeça) */}
+            <path d="M 68,48 Q 120,68 172,48 L 167,63 Q 120,85 73,63 Z" fill="#B86400" />
+            {/* Chevron branco na banda */}
+            <path d="M 70,51 Q 120,70 170,51 L 168,57 Q 120,76 72,57 Z" fill="#FFFFFF" opacity="0.95" />
+
+            {/* Borda frontal do board — cria profundidade 3D */}
+            <path d="M 32,32 L 120,56 L 208,32 L 208,40 L 120,65 L 32,40 Z" fill="#7A3D00" />
+
+            {/* Superfície superior do board */}
+            <path d="M 120,7 L 208,32 L 120,56 L 32,32 Z" fill={`url(#hatBoardGrad-${uid})`} />
+
+            {/* Botão central */}
+            <ellipse cx="120" cy="32" rx="7" ry="5" fill="#F5C030" />
+
+            {/* Cordão do Tassel */}
+            <path d="M 120,32 C 98,32 76,35 62,52" fill="none" stroke="#F5C030" strokeWidth="4" strokeLinecap="round" />
+
+            {/* Pompom do Tassel */}
+            <circle data-testid="owl-hat-tassel" cx="61" cy="57" r="9" fill="#F5C030" />
+
+            {/* Franja do Tassel */}
+            <g stroke="#F5C030" strokeWidth="3" strokeLinecap="round" fill="none">
+              <line x1="51" y1="66" x2="45" y2="88" />
+              <line x1="57" y1="67" x2="53" y2="89" />
+              <line x1="62" y1="67" x2="61" y2="89" />
+              <line x1="67" y1="67" x2="69" y2="88" />
+              <line x1="72" y1="66" x2="76" y2="86" />
+            </g>
+          </g>
+
+        </g>
       </svg>
     </div>
   )

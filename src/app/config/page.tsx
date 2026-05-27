@@ -46,10 +46,13 @@ export default function ConfigPage() {
         rag_retrieval_k, rag_chunk_size, rag_score_threshold,
       }) =>
         setCfg({
-          system_prompt, llm_provider, llm_model,
+          system_prompt: system_prompt ?? '',
+          llm_provider: llm_provider ?? 'google',
+          llm_model: llm_model ?? '',
           llm_temperature: llm_temperature ?? 0.3,
           llm_max_tokens: llm_max_tokens ?? 1024,
-          embed_provider, embed_model,
+          embed_provider: embed_provider ?? 'google',
+          embed_model: embed_model ?? '',
           rag_retrieval_k: rag_retrieval_k ?? 6,
           rag_chunk_size: rag_chunk_size ?? 900,
           rag_score_threshold: rag_score_threshold ?? 0.0,
