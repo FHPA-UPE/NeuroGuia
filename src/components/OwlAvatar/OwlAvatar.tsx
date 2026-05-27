@@ -140,9 +140,6 @@ function renderWingRight(pose: WingPose, uid: string) {
         d="M 182,163 C 185,157 200,156 215,170 C 228,184 222,212 202,222 C 185,230 166,220 164,205 C 161,188 170,167 182,163 Z"
         fill={`url(#owlWingGrad-${uid})`}
       />
-      <path d="M 220,200 C 208,213 193,213 184,200" stroke="#8A4A00" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.5" />
-      <path d="M 216,213 C 202,225 188,223 180,211" stroke="#8A4A00" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.5" />
-      <path d="M 210,223 C 198,232 186,230 182,221" stroke="#8A4A00" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.5" />
     </g>
   )
 }
