@@ -6,10 +6,10 @@ import { useChat } from '@/hooks/useChat'
 import { useSpeech } from '@/hooks/useSpeech'
 import { useTTS } from '@/hooks/useTTS'
 import { AppHeader } from '@/components/AppHeader'
+import { Sidebar } from '@/components/Sidebar'
 import OwlAvatar from '@/components/OwlAvatar/OwlAvatar'
 import { ChatBubble } from '@/components/ChatBubble'
 import { ChatInput } from '@/components/ChatInput'
-import { EmotionControls } from '@/components/EmotionControls'
 import { LgpdModal } from '@/components/LgpdModal'
 import QuickReply from '@/components/QuickReply/QuickReply'
 import { SessionRatingToast } from '@/components/SessionRatingToast'
@@ -109,81 +109,86 @@ export default function ChatPage() {
     <>
       <AppHeader onLogout={handleLogout} />
 
-      <div className="flex flex-col h-[calc(100vh-64px)] bg-cream">
-        {/* Zona de palco OWL */}
-        <div
-          className="flex flex-col items-center pt-5 pb-3 shrink-0"
-          style={{ backgroundColor: STAGE_COLORS[avatarState], transition: 'background-color 0.4s ease' }}
-        >
-          <OwlAvatar
-            avatarState={avatarState}
-            movement={effectiveMovement}
-            beakOpen={beakOpen}
-          />
-          <EmotionControls
-            visible={mounted && user?.role === 'admin'}
-            avatarState={avatarState}
-            movement={movement}
-            onStateChange={setAvatarState}
-            onMovementChange={setMovement}
-          />
-        </div>
+      <div className="flex h-[calc(100vh-64px)] bg-cream">
+        {/* Sidebar */}
+        <Sidebar
+          visible={mounted && user?.role === 'admin'}
+          avatarState={avatarState}
+          movement={movement}
+          onAvatarStateChange={setAvatarState}
+          onMovementChange={setMovement}
+        />
 
-        {/* Mensagens */}
-        <main
-          id="main-content"
-          className="flex-1 overflow-y-auto px-4 py-4"
-          aria-live="polite"
-          aria-label="Conversa com OWL"
-        >
-          <div className="max-w-3xl mx-auto w-full">
-            {messages.length > 0 && (
-              <div className="flex justify-end mb-2">
-                <button
-                  type="button"
-                  onClick={handleClearChat}
-                  className="flex items-center gap-1.5 text-xs text-slate-text hover:text-error border border-mist hover:border-error/40 hover:bg-error/5 rounded-lg px-3 py-1.5 transition-colors"
-                >
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Limpar conversa
-                </button>
-              </div>
-            )}
-            {messages.map(msg => (
-              <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} currentOwlState={avatarState} />
-            ))}
-            {isLoading && (
-              <div className="flex items-end gap-2 mb-4">
-                <div className="w-10 h-10 shrink-0" />
-                <div aria-label="Carregando resposta" className="flex gap-1 p-3">
-                  <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </main>
-
-        {/* Quick replies + Input */}
-        <div className="shrink-0 bg-cream-card border-t border-mist shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
-          <div className="max-w-3xl mx-auto w-full px-4">
-            {quickReplies.length > 0 && (
-              <QuickReply options={quickReplies} onSelect={handleSend} />
-            )}
-            <ChatInput
-              onSend={handleSend}
-              disabled={isLoading}
-              isListening={isListening}
-              isSpeaking={audioEnabled || speechIsSpeaking || ttsIsSpeaking}
-              speechSupported={mounted && supported}
-              onToggleListen={handleToggleListen}
-              onToggleSpeak={handleToggleSpeak}
-              transcript={transcript}
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Zona de palco OWL */}
+          <div
+            className="flex flex-col items-center pt-5 pb-3 shrink-0"
+            style={{ backgroundColor: STAGE_COLORS[avatarState], transition: 'background-color 0.4s ease' }}
+          >
+            <OwlAvatar
+              avatarState={avatarState}
+              movement={effectiveMovement}
+              beakOpen={beakOpen}
             />
+          </div>
+
+          {/* Mensagens */}
+          <main
+            id="main-content"
+            className="flex-1 overflow-y-auto px-4 py-4"
+            aria-live="polite"
+            aria-label="Conversa com OWL"
+          >
+            <div className="max-w-3xl mx-auto w-full">
+              {messages.length > 0 && (
+                <div className="flex justify-end mb-2">
+                  <button
+                    type="button"
+                    onClick={handleClearChat}
+                    className="flex items-center gap-1.5 text-xs text-slate-text hover:text-error border border-mist hover:border-error/40 hover:bg-error/5 rounded-lg px-3 py-1.5 transition-colors"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    Limpar conversa
+                  </button>
+                </div>
+              )}
+              {messages.map(msg => (
+                <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} currentOwlState={avatarState} />
+              ))}
+              {isLoading && (
+                <div className="flex items-end gap-2 mb-4">
+                  <div className="w-10 h-10 shrink-0" />
+                  <div aria-label="Carregando resposta" className="flex gap-1 p-3">
+                    <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 bg-owl-orange rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </main>
+
+          {/* Quick replies + Input */}
+          <div className="shrink-0 bg-cream-card border-t border-mist shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+            <div className="max-w-3xl mx-auto w-full px-4">
+              {quickReplies.length > 0 && (
+                <QuickReply options={quickReplies} onSelect={handleSend} />
+              )}
+              <ChatInput
+                onSend={handleSend}
+                disabled={isLoading}
+                isListening={isListening}
+                isSpeaking={audioEnabled || speechIsSpeaking || ttsIsSpeaking}
+                speechSupported={mounted && supported}
+                onToggleListen={handleToggleListen}
+                onToggleSpeak={handleToggleSpeak}
+                transcript={transcript}
+              />
+            </div>
           </div>
         </div>
       </div>
