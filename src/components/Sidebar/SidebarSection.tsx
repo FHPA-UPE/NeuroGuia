@@ -38,7 +38,7 @@ export function SidebarSection({ title, id, children, collapsed, onToggle }: Sid
         role="region"
         aria-labelledby={`${id}-header`}
         inert={collapsed || undefined}
-        className={`overflow-hidden transition-[max-height] duration-200 ${collapsed ? 'max-h-0' : 'max-h-[1000px]'}`}
+        className={`overflow-hidden transition-[max-height] duration-200 ${collapsed ? 'max-h-0' : 'max-h-[500px]'}`}
       >
         <div className="px-4 py-3 flex flex-col gap-2">
           {children}

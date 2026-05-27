@@ -117,7 +117,7 @@ function SidebarContent({
   onConfigToggle,
 }: SidebarContentProps) {
   return (
-    <div className="flex flex-col overflow-y-auto h-full no-scrollbar">
+    <div className="flex flex-col overflow-y-auto h-full">
       {/* Avatar section */}
       <SidebarSection
         id="sidebar-avatar"

@@ -347,19 +347,17 @@ export default function OwlAvatar({ avatarState, movement = 'idle', beakOpen = f
             {/* Botão central */}
             <ellipse cx="120" cy="32" rx="7" ry="5" fill="#F5C030" />
 
-            {/* Cordão do Tassel */}
-            <path d="M 120,32 C 98,32 76,35 62,52" fill="none" stroke="#F5C030" strokeWidth="4" strokeLinecap="round" />
-
-            {/* Pompom do Tassel */}
-            <circle data-testid="owl-hat-tassel" cx="61" cy="57" r="9" fill="#F5C030" />
-
-            {/* Franja do Tassel */}
-            <g stroke="#F5C030" strokeWidth="3" strokeLinecap="round" fill="none">
-              <line x1="51" y1="66" x2="45" y2="88" />
-              <line x1="57" y1="67" x2="53" y2="89" />
-              <line x1="62" y1="67" x2="61" y2="89" />
-              <line x1="67" y1="67" x2="69" y2="88" />
-              <line x1="72" y1="66" x2="76" y2="86" />
+            {/* Tassel completo — cordão + pompom + franja */}
+            <g data-testid="owl-hat-tassel">
+              <path d="M 120,32 C 98,32 76,35 62,52" fill="none" stroke="#F5C030" strokeWidth="4" strokeLinecap="round" />
+              <circle cx="61" cy="57" r="9" fill="#F5C030" />
+              <g stroke="#F5C030" strokeWidth="3" strokeLinecap="round" fill="none">
+                <line x1="51" y1="66" x2="45" y2="88" />
+                <line x1="57" y1="67" x2="53" y2="89" />
+                <line x1="62" y1="67" x2="61" y2="89" />
+                <line x1="67" y1="67" x2="69" y2="88" />
+                <line x1="72" y1="66" x2="76" y2="86" />
+              </g>
             </g>
           </g>
 

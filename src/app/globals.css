@@ -92,10 +92,20 @@
   50% { transform: rotate(25deg); }
 }
 
+@keyframes owl-tassel-thoughtful {
+  0%, 100% { transform: rotate(-10deg); }
+  50%       { transform: rotate(10deg); }
+}
+
 .owl-idle    { animation: owl-idle-bob   3s ease-in-out infinite; }
 .owl-talking { animation: owl-talk-bob   0.4s ease-in-out infinite; }
 .owl-thinking{ animation: owl-think-spin 3s ease-in-out infinite; }
 .owl-talk    { animation: owl-talk-beak  0.24s ease-in-out; }
+
+.owl-thoughtful [data-testid="owl-hat-tassel"] {
+  transform-origin: 120px 32px;
+  animation: owl-tassel-thoughtful 2.2s ease-in-out infinite;
+}
 
 /* Moved to owl-* classes above */
 
