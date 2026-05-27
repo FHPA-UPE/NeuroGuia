@@ -98,3 +98,53 @@
 .owl-talk    { animation: owl-talk-beak  0.24s ease-in-out; }
 
 /* Moved to owl-* classes above */
+
+/* Sidebar animations */
+.sidebar-section-content {
+  overflow: hidden;
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+}
+
+.sidebar-section-content[aria-hidden="true"] {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Mobile drawer animations */
+@media (max-width: 767px) {
+  .sidebar-drawer {
+    animation: slide-in-left 0.2s ease;
+  }
+
+  .sidebar-overlay {
+    animation: fade-in 0.2s ease;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Respect prefers-reduced-motion for sidebar animations */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-section-content,
+  .sidebar-drawer,
+  .sidebar-overlay {
+    animation: none;
+    transition: none;
+  }
+}
