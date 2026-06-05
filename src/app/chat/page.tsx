@@ -41,11 +41,10 @@ export default function ChatPage() {
   }, [mounted, user, router])
   const { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement, clearMessages } = useChat()
   const { isListening, isSpeaking: speechIsSpeaking, transcript, supported, startListening, stopListening } = useSpeech()
-  const [audioEnabled, setAudioEnabled] = useState(false)
-  const lastAssistantText = !isLoading
-    ? messages.filter((m) => m.role === 'assistant').at(-1)?.content ?? null
-    : null
-  const { isSpeaking: ttsIsSpeaking, beakOpen } = useTTS(audioEnabled ? lastAssistantText : null)
+  const [activeAudio, setActiveAudio] = useState<{ id: string; text: string } | null>(null)
+  const [audioPlayKey, setAudioPlayKey] = useState(0)
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null)
+  const { isSpeaking: ttsIsSpeaking, beakOpen } = useTTS(activeAudio?.text ?? null, audioPlayKey)
   const effectiveMovement = ttsIsSpeaking ? 'talking' : movement
   const [showLgpdModal, setShowLgpdModal] = useState(false)
   const [lgpdAccepted, setLgpdAccepted] = useState(false)
@@ -69,8 +68,16 @@ export default function ChatPage() {
     if (isListening) stopListening(); else startListening()
   }
 
-  function handleToggleSpeak() {
-    setAudioEnabled(a => !a)
+  useEffect(() => {
+    if (!ttsIsSpeaking) {
+      setSpeakingMessageId(null)
+    }
+  }, [ttsIsSpeaking])
+
+  function handleSpeakMessage(message: { id: string; content: string }) {
+    setActiveAudio({ id: message.id, text: message.content })
+    setAudioPlayKey((key) => key + 1)
+    setSpeakingMessageId(message.id)
   }
 
   function handleSend(text: string) { sendMessage(text) }
@@ -164,7 +171,14 @@ export default function ChatPage() {
                 </div>
               )}
               {messages.map(msg => (
-                <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} currentOwlState={avatarState} />
+                <ChatBubble
+                  key={msg.id}
+                  message={msg}
+                  onFeedback={handleFeedback}
+                  currentOwlState={avatarState}
+                  onSpeak={handleSpeakMessage}
+                  isSpeaking={speakingMessageId === msg.id}
+                />
               ))}
               {isLoading && (
                 <div className="flex items-end gap-2 mb-4">
@@ -188,17 +202,18 @@ export default function ChatPage() {
               )}
               <div className="relative">
                 <EmotionControls
+                  visible={mounted && user?.role === 'admin'}
                   avatarState={avatarState}
-                  onAvatarStateChange={setAvatarState}
+                  movement={movement}
+                  onStateChange={setAvatarState}
+                  onMovementChange={setMovement}
                 />
                 <ChatInput
                   onSend={handleSend}
                   disabled={isLoading}
                   isListening={isListening}
-                  isSpeaking={audioEnabled || speechIsSpeaking || ttsIsSpeaking}
                   speechSupported={mounted && supported}
                   onToggleListen={handleToggleListen}
-                  onToggleSpeak={handleToggleSpeak}
                   transcript={transcript}
                 />
               </div>
