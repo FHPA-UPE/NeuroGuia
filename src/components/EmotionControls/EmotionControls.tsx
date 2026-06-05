@@ -1,6 +1,9 @@
+'use client'
+import { useState } from 'react'
 import type { AvatarState, Movement } from '@/types/chat'
 
 interface EmotionControlsProps {
+  visible: boolean
   avatarState: AvatarState
   movement: Movement
   onStateChange: (state: AvatarState) => void
@@ -16,55 +19,82 @@ const STATES: { value: AvatarState; label: string }[] = [
 ]
 
 const MOVEMENTS: { value: Movement; label: string }[] = [
-  { value: 'idle',     label: 'Repouso' },
-  { value: 'talking',  label: 'Falando' },
+  { value: 'idle',    label: 'Repouso' },
+  { value: 'talking', label: 'Falando' },
   { value: 'thinking', label: 'Pensando' },
 ]
 
-export default function EmotionControls({ avatarState, movement, onStateChange, onMovementChange }: EmotionControlsProps) {
-  return (
-    <div className="flex-shrink-0 border-y border-[#2D5016]/10 px-4 py-2 flex flex-col gap-1.5">
-      <div className="flex items-center gap-2">
-        <span className="flex-shrink-0 text-[10px] font-bold text-[#2D5016]/35 uppercase tracking-widest w-10">
-          Emoção
-        </span>
-        <div className="flex flex-wrap gap-1.5">
-          {STATES.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => onStateChange(value)}
-              className={`px-2.5 py-0.5 rounded-full text-xs border transition-colors ${
-                avatarState === value
-                  ? 'bg-[#2D5016] text-white border-[#2D5016]'
-                  : 'text-[#2D5016]/55 border-[#2D5016]/20 hover:border-[#2D5016]/45'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
+export function EmotionControls({ visible, avatarState, movement, onStateChange, onMovementChange }: EmotionControlsProps) {
+  const [collapsed, setCollapsed] = useState(true)
 
-      <div className="flex items-center gap-2">
-        <span className="flex-shrink-0 text-[10px] font-bold text-[#C8860A]/45 uppercase tracking-widest w-10">
-          Mov.
-        </span>
-        <div className="flex flex-wrap gap-1.5">
-          {MOVEMENTS.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => onMovementChange(value)}
-              className={`px-2.5 py-0.5 rounded-full text-xs border transition-colors ${
-                movement === value
-                  ? 'bg-[#C8860A] text-white border-[#C8860A]'
-                  : 'text-[#C8860A]/55 border-[#C8860A]/20 hover:border-[#C8860A]/45'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+  if (!visible) return null
+
+  return (
+    <div className="flex-shrink-0 border-y border-mist w-full">
+      <button
+        type="button"
+        onClick={() => setCollapsed(c => !c)}
+        aria-expanded={!collapsed}
+        aria-controls="emotion-controls-panel"
+        className="w-full flex items-center justify-between px-4 py-1.5 text-[10px] font-bold text-slate-text uppercase tracking-widest hover:bg-mist/40 transition-colors"
+      >
+        <span>Controles do avatar</span>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          aria-hidden="true"
+          className={`transition-transform duration-200 ${collapsed ? '' : 'rotate-180'}`}
+        >
+          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {!collapsed && (
+        <div id="emotion-controls-panel" className="px-4 py-2 flex flex-col gap-1.5">
+          <div className="flex items-center gap-2">
+            <span className="flex-shrink-0 text-[10px] font-bold text-slate-text uppercase tracking-widest w-12">
+              Emoção
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {STATES.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => onStateChange(value)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors min-h-[28px] ${
+                    avatarState === value
+                      ? 'bg-owl-orange text-white border-owl-orange'
+                      : 'text-owl-orange-dark border-owl-orange/30 hover:border-owl-orange bg-owl-orange-soft/50'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="flex-shrink-0 text-[10px] font-bold text-slate-text uppercase tracking-widest w-12">
+              Mov.
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {MOVEMENTS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => onMovementChange(value)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors min-h-[28px] ${
+                    movement === value
+                      ? 'bg-violet text-white border-violet'
+                      : 'text-violet-dark border-violet/30 hover:border-violet bg-violet-soft/50'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
