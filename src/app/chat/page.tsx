@@ -10,6 +10,7 @@ import { Sidebar } from '@/components/Sidebar'
 import OwlAvatar from '@/components/OwlAvatar/OwlAvatar'
 import { ChatBubble } from '@/components/ChatBubble'
 import { ChatInput } from '@/components/ChatInput'
+import { EmotionControls } from '@/components/EmotionControls'
 import { LgpdModal } from '@/components/LgpdModal'
 import QuickReply from '@/components/QuickReply/QuickReply'
 import { SessionRatingToast } from '@/components/SessionRatingToast'
@@ -31,6 +32,13 @@ export default function ChatPage() {
   const [mounted, setMounted] = useState(false)
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true) }, [])
+  
+  // Redirecionar se não autenticado
+  useEffect(() => {
+    if (mounted && !user) {
+      router.push('/login')
+    }
+  }, [mounted, user, router])
   const { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement, clearMessages } = useChat()
   const { isListening, isSpeaking: speechIsSpeaking, transcript, supported, startListening, stopListening } = useSpeech()
   const [audioEnabled, setAudioEnabled] = useState(false)
@@ -172,22 +180,28 @@ export default function ChatPage() {
             </div>
           </main>
 
-          {/* Quick replies + Input */}
-          <div className="shrink-0 bg-cream-card border-t border-mist shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+          {/* Quick replies + Input + EmotionControls */}
+          <div className="shrink-0 bg-cream-card border-t border-mist shadow-[0_-4px_12px_rgba(0,0,0,0.06)] relative">
             <div className="max-w-3xl mx-auto w-full px-4">
               {quickReplies.length > 0 && (
                 <QuickReply options={quickReplies} onSelect={handleSend} />
               )}
-              <ChatInput
-                onSend={handleSend}
-                disabled={isLoading}
-                isListening={isListening}
-                isSpeaking={audioEnabled || speechIsSpeaking || ttsIsSpeaking}
-                speechSupported={mounted && supported}
-                onToggleListen={handleToggleListen}
-                onToggleSpeak={handleToggleSpeak}
-                transcript={transcript}
-              />
+              <div className="relative">
+                <EmotionControls
+                  avatarState={avatarState}
+                  onAvatarStateChange={setAvatarState}
+                />
+                <ChatInput
+                  onSend={handleSend}
+                  disabled={isLoading}
+                  isListening={isListening}
+                  isSpeaking={audioEnabled || speechIsSpeaking || ttsIsSpeaking}
+                  speechSupported={mounted && supported}
+                  onToggleListen={handleToggleListen}
+                  onToggleSpeak={handleToggleSpeak}
+                  transcript={transcript}
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -13,5 +13,10 @@
     "username": "admin",
     "password": "$2b$12$53HlHp89ovNCzmIPecRZDOMhHCOAYs9o.JbtwnaXA2dz3.fK5OWAO",
     "role": "admin"
+  },
+  {
+    "username": "isa",
+    "password": "$2b$12$bYUXZe9aSWO/gtRY3S6QOeV147ebUWotyDFfrnrsV9drWPVeKWUHS",
+    "role": "admin"
   }
 ]
