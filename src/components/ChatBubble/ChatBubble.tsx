@@ -41,6 +41,71 @@ function UserAvatarThumb() {
   )
 }
 
+function escapeHtml(text: string) {
+  return text.replace(/[&<>"]|'/g, char => {
+    switch (char) {
+      case '&': return '&amp;'
+      case '<': return '&lt;'
+      case '>': return '&gt;'
+      case '"': return '&quot;'
+      case "'": return '&#39;'
+      default: return char
+    }
+  })
+}
+
+function renderMarkdown(content: string) {
+  const escaped = escapeHtml(content)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.+?)__/g, '<strong>$1</strong>')
+
+  let html = ''
+  let currentList: 'ul' | 'ol' | null = null
+
+  const closeList = () => {
+    if (currentList) {
+      html += `</${currentList}>`
+      currentList = null
+    }
+  }
+
+  escaped.split('\n').forEach(line => {
+    const trimmed = line.trim()
+    const unordered = trimmed.match(/^[-*+]\s+(.*)$/)
+    const ordered = trimmed.match(/^\d+\.\s+(.*)$/)
+
+    if (unordered) {
+      if (currentList !== 'ul') {
+        closeList()
+        currentList = 'ul'
+        html += '<ul class="list-disc list-inside gap-1 mb-2">'
+      }
+      html += `<li>${unordered[1]}</li>`
+      return
+    }
+
+    if (ordered) {
+      if (currentList !== 'ol') {
+        closeList()
+        currentList = 'ol'
+        html += '<ol class="list-decimal list-inside gap-1 mb-2">'
+      }
+      html += `<li>${ordered[1]}</li>`
+      return
+    }
+
+    closeList()
+    if (trimmed === '') {
+      html += '<p></p>'
+      return
+    }
+    html += `<p>${trimmed}</p>`
+  })
+
+  closeList()
+  return html
+}
+
 export function ChatBubble({ message, onFeedback, currentOwlState, onSpeak, isSpeaking }: Props) {
   const [sourcesOpen, setSourcesOpen] = useState(false)
   const isAssistant = message.role === 'assistant'
@@ -60,7 +125,10 @@ export function ChatBubble({ message, onFeedback, currentOwlState, onSpeak, isSp
             : 'bg-violet-soft border-r-4 border-violet rounded-tr-sm'
         }`}
       >
-        <p className="text-ink">{message.content}</p>
+        <div
+          className="text-ink break-words"
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
+        />
 
         {hasSources && (
           <div className="mt-2">
