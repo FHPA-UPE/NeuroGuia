@@ -19,14 +19,20 @@ function loadMessages(): ChatMessage[] {
 }
 
 export function useChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => loadMessages())
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [avatarState, setAvatarState] = useState<AvatarState>('neutral')
   const [movement, setMovement] = useState<Movement>('idle')
   const [isLoading, setIsLoading] = useState(false)
   const [quickReplies, setQuickReplies] = useState<string[]>([])
 
   useEffect(() => {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+    setMessages(loadMessages())
+  }, [])
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+    }
   }, [messages])
 
   const clearMessages = useCallback(() => {

@@ -44,6 +44,11 @@ class ChatRequest(BaseModel):
     history: list[dict] = []
 
 
+def _filter_sources(sources: list) -> list:
+    """Keep only entries that look like real document names (have a file extension)."""
+    return [s for s in sources if isinstance(s, str) and '.' in s]
+
+
 async def _stream(request: ChatRequest) -> AsyncGenerator:
     cfg = config_service.read_config()
     system_prompt = cfg["system_prompt"]
@@ -55,8 +60,10 @@ async def _stream(request: ChatRequest) -> AsyncGenerator:
 
     embeddings = get_embeddings()
     docs = rag_service.retrieve(request.message, embeddings)
-    sources = rag_service.extract_sources(docs)
-    context = "\n\n".join(d.page_content for d in docs)
+    context = "\n\n".join(
+        f"[Fonte: {doc.metadata.get('source', 'Documento')}]\n{doc.page_content}"
+        for doc in docs
+    )
 
     messages = build_messages(system_prompt, request.history, request.message, context)
 
@@ -67,9 +74,7 @@ async def _stream(request: ChatRequest) -> AsyncGenerator:
             buffer += token
 
         parsed = _parse_json_response(buffer)
-        if docs:
-            parsed["sources"] = sources
-
+        parsed["sources"] = _filter_sources(parsed.get("sources", []))
         yield {"data": json.dumps(parsed, ensure_ascii=False)}
     except Exception as e:
         logger.exception("Erro na chamada ao LLM: %s", e)
