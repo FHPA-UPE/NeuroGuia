@@ -14,6 +14,7 @@ import { EmotionControls } from '@/components/EmotionControls'
 import { LgpdModal } from '@/components/LgpdModal'
 import QuickReply from '@/components/QuickReply/QuickReply'
 import { SessionRatingToast } from '@/components/SessionRatingToast'
+import { StarterQuestions } from '@/components/StarterQuestions'
 import type { AvatarState } from '@/types/chat'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
@@ -149,6 +150,9 @@ export default function ChatPage() {
             aria-label="Conversa com OWL"
           >
             <div className="max-w-3xl mx-auto w-full">
+              {messages.length === 0 && !isLoading && (
+                <StarterQuestions onSelect={handleSend} />
+              )}
               {messages.length > 0 && (
                 <div className="flex justify-end mb-2">
                   <button
