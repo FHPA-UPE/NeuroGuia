@@ -55,8 +55,10 @@ async def _stream(request: ChatRequest) -> AsyncGenerator:
 
     embeddings = get_embeddings()
     docs = rag_service.retrieve(request.message, embeddings)
-    sources = rag_service.extract_sources(docs)
-    context = "\n\n".join(d.page_content for d in docs)
+    context = "\n\n".join(
+        f"[Fonte: {doc.metadata.get('source', 'Documento')}]\n{doc.page_content}"
+        for doc in docs
+    )
 
     messages = build_messages(system_prompt, request.history, request.message, context)
 
@@ -67,9 +69,6 @@ async def _stream(request: ChatRequest) -> AsyncGenerator:
             buffer += token
 
         parsed = _parse_json_response(buffer)
-        if docs:
-            parsed["sources"] = sources
-
         yield {"data": json.dumps(parsed, ensure_ascii=False)}
     except Exception as e:
         logger.exception("Erro na chamada ao LLM: %s", e)
