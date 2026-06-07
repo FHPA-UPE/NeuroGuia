@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Props {
   onSend: (text: string) => void
@@ -15,7 +15,14 @@ export function ChatInput({
   speechSupported, onToggleListen, transcript = '',
 }: Props) {
   const [text, setText] = useState('')
-  const value = transcript || text
+  // When a transcript arrives from the microphone, copy it into local
+  // state so the user can edit the transcribed text before sending.
+  useEffect(() => {
+    if (transcript) setText(transcript)
+    // Do not clear local text when transcript becomes empty so user edits persist
+  }, [transcript])
+
+  const value = text
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
