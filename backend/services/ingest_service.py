@@ -94,10 +94,15 @@ async def ingest_file(path: Path, embeddings, progress_queue: asyncio.Queue) -> 
 
 def delete_by_source_id(source_id: str) -> int:
     collection = get_chroma_collection()
-    results = collection.get(where={"source_id": source_id})
+    results = collection.get(where={"source_id": source_id}, include=["metadatas"])
     ids = results["ids"]
-    if ids:
-        collection.delete(ids=ids)
+    if not ids:
+        return 0
+    filename = (results["metadatas"][0] or {}).get("source", "") if results["metadatas"] else ""
+    collection.delete(ids=ids)
+    if filename:
+        physical = Path(__file__).parent.parent / "docs" / filename
+        physical.unlink(missing_ok=True)
     return len(ids)
 
 
