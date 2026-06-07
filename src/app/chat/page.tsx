@@ -10,7 +10,6 @@ import { Sidebar } from '@/components/Sidebar'
 import OwlAvatar from '@/components/OwlAvatar/OwlAvatar'
 import { ChatBubble } from '@/components/ChatBubble'
 import { ChatInput } from '@/components/ChatInput'
-import { EmotionControls } from '@/components/EmotionControls'
 import { LgpdModal } from '@/components/LgpdModal'
 import QuickReply from '@/components/QuickReply/QuickReply'
 import { SessionRatingToast } from '@/components/SessionRatingToast'
@@ -127,7 +126,7 @@ export default function ChatPage() {
       <div className="flex h-[calc(100vh-64px)] bg-cream">
         {/* Sidebar */}
         <Sidebar
-          visible={mounted && user?.role === 'admin'}
+          visible={mounted && (user?.role === 'admin' || user?.role === 'admin_ppgec')}
           avatarState={avatarState}
           movement={movement}
           onAvatarStateChange={setAvatarState}
@@ -156,7 +155,7 @@ export default function ChatPage() {
             aria-label="Conversa com OWL"
           >
             <div className="max-w-3xl mx-auto w-full">
-              {messages.length > 0 && (
+              {mounted && messages.length > 0 && (
                 <div className="flex justify-end mb-2">
                   <button
                     type="button"
@@ -201,13 +200,6 @@ export default function ChatPage() {
                 <QuickReply options={quickReplies} onSelect={handleSend} />
               )}
               <div className="relative">
-                <EmotionControls
-                  visible={mounted && user?.role === 'admin'}
-                  avatarState={avatarState}
-                  movement={movement}
-                  onStateChange={setAvatarState}
-                  onMovementChange={setMovement}
-                />
                 <ChatInput
                   onSend={handleSend}
                   disabled={isLoading}
