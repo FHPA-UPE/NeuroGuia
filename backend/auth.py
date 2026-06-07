@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 USERS_PATH = Path(__file__).parent / "users.json"
 SECRET_KEY = os.getenv("JWT_SECRET", "neuroguia-dev-secret-change-in-prod")
 ALGORITHM = "HS256"
-TOKEN_EXPIRE_MINUTES = 30
+TOKEN_EXPIRE_MINUTES = 1440  # 24 horas
 
 
 def _load_users() -> list[dict]:

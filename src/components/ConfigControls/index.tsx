@@ -37,7 +37,13 @@ const DEFAULT_CONFIG: ConfigState = {
 
 function getToken(): string {
   if (typeof window === 'undefined') return ''
-  return sessionStorage.getItem('access_token') ?? ''
+  const stored = sessionStorage.getItem('access_token')
+  if (stored) return stored
+  const cookie = document.cookie
+    .split(';')
+    .map(part => part.trim())
+    .find(part => part.startsWith('access_token='))
+  return cookie ? cookie.slice('access_token='.length) : ''
 }
 
 const fieldClass =

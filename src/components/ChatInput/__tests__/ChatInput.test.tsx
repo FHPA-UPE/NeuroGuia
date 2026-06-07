@@ -6,10 +6,8 @@ const baseProps = {
   onSend: jest.fn(),
   disabled: false,
   isListening: false,
-  isSpeaking: false,
   speechSupported: true,
   onToggleListen: jest.fn(),
-  onToggleSpeak: jest.fn(),
 }
 
 test('renderiza campo de texto e botão enviar', () => {
