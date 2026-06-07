@@ -5,16 +5,14 @@ interface Props {
   onSend: (text: string) => void
   disabled: boolean
   isListening: boolean
-  isSpeaking: boolean
   speechSupported: boolean
   onToggleListen: () => void
-  onToggleSpeak: () => void
   transcript?: string
 }
 
 export function ChatInput({
-  onSend, disabled, isListening, isSpeaking,
-  speechSupported, onToggleListen, onToggleSpeak, transcript = '',
+  onSend, disabled, isListening,
+  speechSupported, onToggleListen, transcript = '',
 }: Props) {
   const [text, setText] = useState('')
   const value = transcript || text
@@ -59,23 +57,6 @@ export function ChatInput({
         className="flex-1 rounded-2xl border border-mist px-5 py-4 text-base bg-cream min-h-[56px] placeholder:text-slate-text/60 disabled:opacity-60 focus-visible:border-owl-orange-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-owl-orange-dark"
         aria-label="Mensagem para o OWL"
       />
-
-      {speechSupported && (
-        <button
-          type="button"
-          aria-label={isSpeaking ? 'Silenciar OWL' : 'OWL falar em voz alta'}
-          onClick={onToggleSpeak}
-          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 ${
-            isSpeaking
-              ? 'bg-owl-orange text-ink'
-              : 'bg-mist hover:bg-owl-orange-soft text-ink'
-          }`}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      )}
 
       <button
         type="submit"

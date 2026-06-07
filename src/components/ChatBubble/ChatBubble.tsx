@@ -7,6 +7,8 @@ interface Props {
   message: ChatMessage
   onFeedback: (messageId: string, rating: 'up' | 'down') => void
   currentOwlState?: AvatarState
+  onSpeak?: (message: ChatMessage) => void
+  isSpeaking?: boolean
 }
 
 function OwlAvatarThumb({ state }: { state: AvatarState }) {
@@ -39,7 +41,7 @@ function UserAvatarThumb() {
   )
 }
 
-export function ChatBubble({ message, onFeedback, currentOwlState }: Props) {
+export function ChatBubble({ message, onFeedback, currentOwlState, onSpeak, isSpeaking }: Props) {
   const [sourcesOpen, setSourcesOpen] = useState(false)
   const isAssistant = message.role === 'assistant'
   const hasSources = isAssistant && message.sources && message.sources.length > 0
@@ -79,6 +81,16 @@ export function ChatBubble({ message, onFeedback, currentOwlState }: Props) {
 
         {isAssistant && (
           <div className="flex gap-2 mt-2">
+            <button
+              type="button"
+              aria-label="Reproduzir resposta em áudio"
+              onClick={() => onSpeak?.(message)}
+              className={`text-lg hover:scale-110 transition-transform min-h-[44px] min-w-[44px] flex items-center justify-center opacity-60 hover:opacity-100 ${
+                isSpeaking ? 'text-owl-orange opacity-100' : ''
+              }`}
+            >
+              🔊
+            </button>
             <button
               aria-label="Resposta útil"
               onClick={() => onFeedback(message.id, 'up')}
