@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 
 interface AppHeaderProps {
@@ -10,17 +10,26 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ onLogout }: AppHeaderProps) {
-  const pathname = usePathname()
+  const [isChatPage, setIsChatPage] = useState(false)
+  const [isIngestPage, setIsIngestPage] = useState(false)
+  const [isFeedbackPage, setIsFeedbackPage] = useState(false)
+  const [isConfigPage, setIsConfigPage] = useState(false)
   const router = useRouter()
   const { user, logout } = useAuth()
 
   const [mounted, setMounted] = useState(false)
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    setMounted(true)
+    const path = window.location.pathname
+    setIsChatPage(path === '/chat')
+    setIsIngestPage(path === '/ingest')
+    setIsFeedbackPage(path === '/feedback')
+    setIsConfigPage(path === '/config')
+  }, [])
 
-  const isChatPage = pathname === '/chat'
   const isAdmin = user?.role && ['admin', 'admin_ppgec'].includes(user.role)
-  const isAdminPage = ['/ingest', '/feedback', '/config'].includes(pathname ?? '')
+  const isAdminPage = isIngestPage || isFeedbackPage || isConfigPage
 
   function handleLogout() {
     if (onLogout) { onLogout(); return }
@@ -55,22 +64,22 @@ export function AppHeader({ onLogout }: AppHeaderProps) {
               <>
                 <Link
                   href="/ingest"
-                  className={`text-sm hover:underline ${pathname === '/ingest' ? 'text-ink font-semibold' : 'text-violet'}`}
+                  className={`text-sm hover:underline ${isIngestPage ? 'text-ink font-semibold' : 'text-violet'}`}
                 >
                   Base de Conhecimento
                 </Link>
                 <Link
                   href="/feedback"
-                  className={`text-sm hover:underline ${pathname === '/feedback' ? 'text-ink font-semibold' : 'text-violet'}`}
+                  className={`text-sm hover:underline ${isFeedbackPage ? 'text-ink font-semibold' : 'text-violet'}`}
                 >
                   Feedback
                 </Link>
               </>
             )}
-            {user?.role === 'admin' && isChatPage && (
+            {(user?.role === 'admin' || user?.role === 'admin_ppgec') && isChatPage && (
               <Link
                 href="/config"
-                className={`text-sm hover:underline ${pathname === '/config' ? 'text-ink font-semibold' : 'text-violet'}`}
+                className={`text-sm hover:underline ${isConfigPage ? 'text-ink font-semibold' : 'text-violet'}`}
               >
                 Configurações
               </Link>

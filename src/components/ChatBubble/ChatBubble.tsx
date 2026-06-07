@@ -7,6 +7,8 @@ interface Props {
   message: ChatMessage
   onFeedback: (messageId: string, rating: 'up' | 'down') => void
   currentOwlState?: AvatarState
+  onSpeak?: (message: ChatMessage) => void
+  isSpeaking?: boolean
 }
 
 function OwlAvatarThumb({ state }: { state: AvatarState }) {
@@ -39,7 +41,72 @@ function UserAvatarThumb() {
   )
 }
 
-export function ChatBubble({ message, onFeedback, currentOwlState }: Props) {
+function escapeHtml(text: string) {
+  return text.replace(/[&<>"]|'/g, char => {
+    switch (char) {
+      case '&': return '&amp;'
+      case '<': return '&lt;'
+      case '>': return '&gt;'
+      case '"': return '&quot;'
+      case "'": return '&#39;'
+      default: return char
+    }
+  })
+}
+
+function renderMarkdown(content: string) {
+  const escaped = escapeHtml(content)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.+?)__/g, '<strong>$1</strong>')
+
+  let html = ''
+  let currentList: 'ul' | 'ol' | null = null
+
+  const closeList = () => {
+    if (currentList) {
+      html += `</${currentList}>`
+      currentList = null
+    }
+  }
+
+  escaped.split('\n').forEach(line => {
+    const trimmed = line.trim()
+    const unordered = trimmed.match(/^[-*+]\s+(.*)$/)
+    const ordered = trimmed.match(/^\d+\.\s+(.*)$/)
+
+    if (unordered) {
+      if (currentList !== 'ul') {
+        closeList()
+        currentList = 'ul'
+        html += '<ul class="list-disc list-inside gap-1 mb-2">'
+      }
+      html += `<li>${unordered[1]}</li>`
+      return
+    }
+
+    if (ordered) {
+      if (currentList !== 'ol') {
+        closeList()
+        currentList = 'ol'
+        html += '<ol class="list-decimal list-inside gap-1 mb-2">'
+      }
+      html += `<li>${ordered[1]}</li>`
+      return
+    }
+
+    closeList()
+    if (trimmed === '') {
+      html += '<p></p>'
+      return
+    }
+    html += `<p>${trimmed}</p>`
+  })
+
+  closeList()
+  return html
+}
+
+export function ChatBubble({ message, onFeedback, currentOwlState, onSpeak, isSpeaking }: Props) {
   const [sourcesOpen, setSourcesOpen] = useState(false)
   const isAssistant = message.role === 'assistant'
   const hasSources = isAssistant && message.sources && message.sources.length > 0
@@ -58,7 +125,10 @@ export function ChatBubble({ message, onFeedback, currentOwlState }: Props) {
             : 'bg-violet-soft border-r-4 border-violet rounded-tr-sm'
         }`}
       >
-        <p className="text-ink">{message.content}</p>
+        <div
+          className="text-ink break-words"
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
+        />
 
         {hasSources && (
           <div className="mt-2">
@@ -79,6 +149,16 @@ export function ChatBubble({ message, onFeedback, currentOwlState }: Props) {
 
         {isAssistant && (
           <div className="flex gap-2 mt-2">
+            <button
+              type="button"
+              aria-label="Reproduzir resposta em áudio"
+              onClick={() => onSpeak?.(message)}
+              className={`text-lg hover:scale-110 transition-transform min-h-[44px] min-w-[44px] flex items-center justify-center opacity-60 hover:opacity-100 ${
+                isSpeaking ? 'text-owl-orange opacity-100' : ''
+              }`}
+            >
+              🔊
+            </button>
             <button
               aria-label="Resposta útil"
               onClick={() => onFeedback(message.id, 'up')}

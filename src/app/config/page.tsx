@@ -4,7 +4,18 @@ import { AppHeader } from '@/components/AppHeader'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 const PROVIDERS = ['anthropic', 'openai', 'google'] as const
-function token() { return sessionStorage.getItem('access_token') ?? '' }
+function token() {
+  const stored = typeof window === 'undefined' ? null : sessionStorage.getItem('access_token')
+  if (stored) return stored
+  if (typeof window === 'undefined') return ''
+
+  const cookie = document.cookie
+    .split(';')
+    .map(part => part.trim())
+    .find(part => part.startsWith('access_token='))
+
+  return cookie ? cookie.slice('access_token='.length) : ''
+}
 
 type CfgState = {
   system_prompt: string
@@ -38,7 +49,10 @@ export default function ConfigPage() {
 
   useEffect(() => {
     fetch(`${API}/config`, { headers: { Authorization: `Bearer ${token()}` } })
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
       .then(({
         system_prompt, llm_provider, llm_model,
         llm_temperature, llm_max_tokens,

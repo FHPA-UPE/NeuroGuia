@@ -4,7 +4,18 @@ import { AppHeader } from '@/components/AppHeader'
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 interface Doc { source: string; source_id: string }
-function token() { return sessionStorage.getItem('access_token') ?? '' }
+function token() {
+  const stored = typeof window === 'undefined' ? null : sessionStorage.getItem('access_token')
+  if (stored) return stored
+  if (typeof window === 'undefined') return ''
+
+  const cookie = document.cookie
+    .split(';')
+    .map(part => part.trim())
+    .find(part => part.startsWith('access_token='))
+
+  return cookie ? cookie.slice('access_token='.length) : ''
+}
 
 interface DocItemProps {
   doc: Doc
