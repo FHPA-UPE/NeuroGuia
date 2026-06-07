@@ -72,6 +72,14 @@ test('user message does not render OwlAvatarThumb', () => {
   expect(screen.queryByRole('img', { name: /OWL está/i })).toBeNull()
 })
 
+test('renderiza marcação simples do assistente com listas e negrito', () => {
+  const content = 'Para solicitar as adaptações pedagógicas, você precisa seguir alguns passos:\n\n* **Prepare a documentação:** Se possível, tenha um laudo médico.\n* **Vá ao setor de escolaridade:** Dirija-se à secretaria do seu Campus/Unidade, onde seu curso está vinculado.'
+  const { container } = render(<ChatBubble message={{ ...baseMsg, content, sources: [] }} onFeedback={() => {}} />)
+  expect(screen.getByText('Prepare a documentação:')).toBeInTheDocument()
+  expect(container.querySelector('ul')).toBeInTheDocument()
+  expect(container.querySelector('strong')).toBeInTheDocument()
+})
+
 test('bot message does not render UserAvatarThumb', () => {
   render(<ChatBubble message={baseMsg} onFeedback={() => {}} />)
   expect(screen.queryByTestId('user-avatar-thumb')).toBeNull()

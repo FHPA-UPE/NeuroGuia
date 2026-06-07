@@ -10,7 +10,6 @@ import { Sidebar } from '@/components/Sidebar'
 import OwlAvatar from '@/components/OwlAvatar/OwlAvatar'
 import { ChatBubble } from '@/components/ChatBubble'
 import { ChatInput } from '@/components/ChatInput'
-import { EmotionControls } from '@/components/EmotionControls'
 import { LgpdModal } from '@/components/LgpdModal'
 import QuickReply from '@/components/QuickReply/QuickReply'
 import { SessionRatingToast } from '@/components/SessionRatingToast'
@@ -41,11 +40,10 @@ export default function ChatPage() {
   }, [mounted, user, router])
   const { messages, avatarState, movement, isLoading, quickReplies, sendMessage, setAvatarState, setMovement, clearMessages } = useChat()
   const { isListening, isSpeaking: speechIsSpeaking, transcript, supported, startListening, stopListening } = useSpeech()
-  const [audioEnabled, setAudioEnabled] = useState(false)
-  const lastAssistantText = !isLoading
-    ? messages.filter((m) => m.role === 'assistant').at(-1)?.content ?? null
-    : null
-  const { isSpeaking: ttsIsSpeaking, beakOpen } = useTTS(audioEnabled ? lastAssistantText : null)
+  const [activeAudio, setActiveAudio] = useState<{ id: string; text: string } | null>(null)
+  const [audioPlayKey, setAudioPlayKey] = useState(0)
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null)
+  const { isSpeaking: ttsIsSpeaking, beakOpen } = useTTS(activeAudio?.text ?? null, audioPlayKey)
   const effectiveMovement = ttsIsSpeaking ? 'talking' : movement
   const [showLgpdModal, setShowLgpdModal] = useState(false)
   const [lgpdAccepted, setLgpdAccepted] = useState(false)
@@ -69,8 +67,16 @@ export default function ChatPage() {
     if (isListening) stopListening(); else startListening()
   }
 
-  function handleToggleSpeak() {
-    setAudioEnabled(a => !a)
+  useEffect(() => {
+    if (!ttsIsSpeaking) {
+      setSpeakingMessageId(null)
+    }
+  }, [ttsIsSpeaking])
+
+  function handleSpeakMessage(message: { id: string; content: string }) {
+    setActiveAudio({ id: message.id, text: message.content })
+    setAudioPlayKey((key) => key + 1)
+    setSpeakingMessageId(message.id)
   }
 
   function handleSend(text: string) { sendMessage(text) }
@@ -120,7 +126,7 @@ export default function ChatPage() {
       <div className="flex h-[calc(100vh-64px)] bg-cream">
         {/* Sidebar */}
         <Sidebar
-          visible={mounted && user?.role === 'admin'}
+          visible={mounted && (user?.role === 'admin' || user?.role === 'admin_ppgec')}
           avatarState={avatarState}
           movement={movement}
           onAvatarStateChange={setAvatarState}
@@ -149,7 +155,7 @@ export default function ChatPage() {
             aria-label="Conversa com OWL"
           >
             <div className="max-w-3xl mx-auto w-full">
-              {messages.length > 0 && (
+              {mounted && messages.length > 0 && (
                 <div className="flex justify-end mb-2">
                   <button
                     type="button"
@@ -164,7 +170,14 @@ export default function ChatPage() {
                 </div>
               )}
               {messages.map(msg => (
-                <ChatBubble key={msg.id} message={msg} onFeedback={handleFeedback} currentOwlState={avatarState} />
+                <ChatBubble
+                  key={msg.id}
+                  message={msg}
+                  onFeedback={handleFeedback}
+                  currentOwlState={avatarState}
+                  onSpeak={handleSpeakMessage}
+                  isSpeaking={speakingMessageId === msg.id}
+                />
               ))}
               {isLoading && (
                 <div className="flex items-end gap-2 mb-4">
@@ -187,18 +200,12 @@ export default function ChatPage() {
                 <QuickReply options={quickReplies} onSelect={handleSend} />
               )}
               <div className="relative">
-                <EmotionControls
-                  avatarState={avatarState}
-                  onAvatarStateChange={setAvatarState}
-                />
                 <ChatInput
                   onSend={handleSend}
                   disabled={isLoading}
                   isListening={isListening}
-                  isSpeaking={audioEnabled || speechIsSpeaking || ttsIsSpeaking}
                   speechSupported={mounted && supported}
                   onToggleListen={handleToggleListen}
-                  onToggleSpeak={handleToggleSpeak}
                   transcript={transcript}
                 />
               </div>

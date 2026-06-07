@@ -52,7 +52,7 @@ function playAudio(src: string, signal: { cancelled: boolean }): Promise<void> {
   })
 }
 
-export function useTTS(text: string | null): { isSpeaking: boolean; beakOpen: boolean } {
+export function useTTS(text: string | null, playKey?: unknown): { isSpeaking: boolean; beakOpen: boolean } {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [beakOpen,   setBeakOpen]   = useState(false)
 
@@ -144,7 +144,7 @@ export function useTTS(text: string | null): { isSpeaking: boolean; beakOpen: bo
       setIsSpeaking(false)
       setBeakOpen(false)
     }
-  }, [text])
+  }, [text, playKey])
 
   return { isSpeaking, beakOpen }
 }
