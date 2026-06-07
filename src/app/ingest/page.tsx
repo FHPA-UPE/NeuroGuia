@@ -71,9 +71,14 @@ function DocItem({ doc, onDelete }: DocItemProps) {
   )
 }
 
+interface PendingFile {
+  file: File
+  status: 'pending' | 'uploading' | 'done' | 'error'
+}
+
 export default function IngestPage() {
   const [docs, setDocs] = useState<Doc[]>([])
-  const [uploading, setUploading] = useState(false)
+  const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([])
   const [ingesting, setIngesting] = useState(false)
   const [progress, setProgress] = useState<string[]>([])
   const [error, setError] = useState('')
@@ -89,22 +94,40 @@ export default function IngestPage() {
     loadDocs()
   }, [])
 
-  async function handleUpload(files: FileList | null) {
+  function handleSelect(files: FileList | null) {
     if (!files?.length) return
-    setUploading(true); setError('')
-    for (const file of Array.from(files)) {
-      const form = new FormData()
-      form.append('file', file)
-      const res = await fetch(`${API}/docs/upload`, {
-        method: 'POST', headers: { Authorization: `Bearer ${token()}` }, body: form,
-      })
-      if (!res.ok) setError(`Erro ao enviar ${file.name}`)
-    }
-    setUploading(false)
+    const incoming = Array.from(files)
+    setPendingFiles(prev => {
+      const existingNames = new Set(prev.map(p => p.file.name))
+      const toAdd = incoming
+        .filter(f => !existingNames.has(f.name))
+        .map(f => ({ file: f, status: 'pending' as const }))
+      return [...prev, ...toAdd]
+    })
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  function handleRemovePending(index: number) {
+    setPendingFiles(prev => prev.filter((_, i) => i !== index))
   }
 
   async function handleIngest() {
-    setIngesting(true); setProgress([])
+    if (!pendingFiles.length) return
+    setIngesting(true); setProgress([]); setError('')
+
+    for (const pf of pendingFiles) {
+      setPendingFiles(prev => prev.map(p => p.file === pf.file ? { ...p, status: 'uploading' } : p))
+      const form = new FormData()
+      form.append('file', pf.file)
+      const res = await fetch(`${API}/docs/upload`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token()}` }, body: form,
+      })
+      setPendingFiles(prev => prev.map(p =>
+        p.file === pf.file ? { ...p, status: res.ok ? 'done' : 'error' } : p
+      ))
+      if (!res.ok) setError(`Erro ao enviar ${pf.file.name}`)
+    }
+
     const res = await fetch(`${API}/docs/ingest`, {
       method: 'POST', headers: { Authorization: `Bearer ${token()}` },
     })
@@ -134,7 +157,7 @@ export default function IngestPage() {
         }
       }
     }
-    setIngesting(false); loadDocs()
+    setIngesting(false); setPendingFiles([]); loadDocs()
   }
 
   async function handleDelete(id: string, name: string) {
@@ -155,7 +178,7 @@ export default function IngestPage() {
           <div
             className="border-2 border-dashed border-mist rounded-2xl p-10 text-center cursor-pointer hover:border-owl-orange transition-colors flex flex-col items-center gap-3"
             onDragOver={e => e.preventDefault()}
-            onDrop={e => { e.preventDefault(); handleUpload(e.dataTransfer.files) }}
+            onDrop={e => { e.preventDefault(); handleSelect(e.dataTransfer.files) }}
             onClick={() => fileRef.current?.click()}
           >
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-slate-text">
@@ -165,18 +188,63 @@ export default function IngestPage() {
             <input
               ref={fileRef} type="file" multiple accept=".pdf,.txt,.docx"
               className="sr-only" aria-label="Selecionar arquivos para upload"
-              onChange={e => handleUpload(e.target.files)}
+              onChange={e => handleSelect(e.target.files)}
             />
           </div>
+          {pendingFiles.length > 0 && (
+            <ul className="mt-4 space-y-2" aria-label="Arquivos selecionados">
+              {pendingFiles.map((pf, i) => (
+                <li key={i} className="flex items-center gap-3 bg-cream-card rounded-2xl border border-mist px-4 min-h-[48px]">
+                  {pf.status === 'uploading' && (
+                    <svg className="animate-spin text-owl-orange shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" strokeLinecap="round" />
+                    </svg>
+                  )}
+                  {pf.status === 'done' && (
+                    <svg className="text-success shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                  {pf.status === 'error' && (
+                    <svg className="text-error shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                      <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                  )}
+                  {pf.status === 'pending' && (
+                    <svg className="text-slate-text shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                  <span className="text-sm text-ink truncate flex-1">{pf.file.name}</span>
+                  <span className="text-xs text-slate-text shrink-0">
+                    {pf.status === 'uploading' ? 'Enviando…' : pf.status === 'done' ? 'Enviado' : pf.status === 'error' ? 'Erro' : ''}
+                  </span>
+                  {pf.status === 'pending' && !ingesting && (
+                    <button
+                      onClick={() => handleRemovePending(i)}
+                      aria-label={`Remover ${pf.file.name} da fila`}
+                      className="text-slate-text hover:text-error hover:bg-error/10 rounded-lg min-w-[36px] min-h-[36px] flex items-center justify-center transition-colors shrink-0"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+                        <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
           {error && (
             <p role="alert" className="flex items-center gap-2 text-sm text-ink bg-error/10 rounded-xl px-4 py-2.5 mt-2 border border-error/30">
               <span aria-hidden="true">⚠️</span> {error}
             </p>
           )}
-          {uploading && <p className="text-slate-text text-sm mt-2">Enviando…</p>}
           <button
             onClick={handleIngest}
-            disabled={ingesting}
+            disabled={ingesting || pendingFiles.length === 0}
             className="mt-4 bg-owl-orange hover:bg-owl-orange-dark text-ink rounded-2xl py-2.5 px-5 font-semibold disabled:opacity-60 transition-colors flex items-center gap-2 min-h-[44px]"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
