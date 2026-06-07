@@ -44,6 +44,20 @@ class ChatRequest(BaseModel):
     history: list[dict] = []
 
 
+_NO_CONTEXT_PHRASES = [
+    "não tenho essa informação",
+    "não há informações no contexto",
+    "minha base de conhecimento não",
+    "não encontrei informações",
+    "não possuo essa informação",
+]
+
+
+def _no_context_used(message: str) -> bool:
+    low = message.lower()
+    return any(phrase in low for phrase in _NO_CONTEXT_PHRASES)
+
+
 async def _stream(request: ChatRequest) -> AsyncGenerator:
     cfg = config_service.read_config()
     system_prompt = cfg["system_prompt"]
@@ -69,6 +83,8 @@ async def _stream(request: ChatRequest) -> AsyncGenerator:
             buffer += token
 
         parsed = _parse_json_response(buffer)
+        if _no_context_used(parsed.get("message", "")):
+            parsed["sources"] = []
         yield {"data": json.dumps(parsed, ensure_ascii=False)}
     except Exception as e:
         logger.exception("Erro na chamada ao LLM: %s", e)
