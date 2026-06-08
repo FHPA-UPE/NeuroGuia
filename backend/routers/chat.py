@@ -102,12 +102,50 @@ async def _heartbeat():
 
 def _parse_json_response(text: str) -> dict:
     text = text.strip()
-    match = re.search(r"\{.*\}", text, re.DOTALL)
-    if match:
+    decoder = json.JSONDecoder()
+
+    # Try direct parse first (model returned bare JSON)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Search for a code block anywhere (handles thinking-token preamble before ```json)
+    code_block = re.search(r'```(?:json)?\s*\n?(.*?)\n?```', text, re.DOTALL)
+    if code_block:
+        inner = code_block.group(1).strip()
         try:
-            return json.loads(match.group())
+            return json.loads(inner)
         except json.JSONDecodeError:
             pass
+
+    # Scan for JSON objects right-to-left: thinking content always comes before the JSON,
+    # so the rightmost { is most likely the start of the actual response object.
+    for m in sorted(re.finditer(r'\{', text), key=lambda x: x.start(), reverse=True):
+        try:
+            result, _ = decoder.raw_decode(text, m.start())
+            if isinstance(result, dict) and "message" in result:
+                return result
+        except json.JSONDecodeError:
+            pass
+
+    # Recover message field from truncated JSON (no closing brace/quote)
+    msg_match = re.search(r'"message"\s*:\s*"((?:[^"\\]|\\.)*?)(?:"|\Z)', text, re.DOTALL)
+    if msg_match:
+        raw = msg_match.group(1)
+        try:
+            message = json.loads(f'"{raw}"')  # unescape \n, \t, \" etc.
+        except json.JSONDecodeError:
+            message = raw
+        return {
+            "message": message,
+            "avatar_state": "neutral",
+            "movement": "talking",
+            "quick_replies": [],
+            "sources": [],
+        }
+
+    logger.warning("Falha ao parsear resposta do LLM. Primeiros 200 chars: %r", text[:200])
     return {
         "message": text[:500] if text else "Não consegui processar a resposta.",
         "avatar_state": "neutral",

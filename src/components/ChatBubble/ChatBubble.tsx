@@ -55,7 +55,7 @@ function escapeHtml(text: string) {
 }
 
 function renderMarkdown(content: string) {
-  const escaped = escapeHtml(content)
+  const escaped = escapeHtml(content.replace(/\\n/g, '\n'))
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/__(.+?)__/g, '<strong>$1</strong>')
 
