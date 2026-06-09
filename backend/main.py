@@ -9,6 +9,7 @@ from routers import chat as chat_router
 from routers import config as config_router
 from routers import docs as docs_router
 from routers import feedback as feedback_router
+from routers.tts import router as tts_router
 
 _ALLOWED_ORIGINS = ["http://localhost:3000"]
 
@@ -35,6 +36,7 @@ app.include_router(chat_router.router)
 app.include_router(config_router.router)
 app.include_router(docs_router.router)
 app.include_router(feedback_router.router)
+app.include_router(tts_router)
 
 
 @app.exception_handler(Exception)
