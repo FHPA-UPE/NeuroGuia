@@ -51,7 +51,8 @@ function playAudio(
 
 async function playOpenAITTS(
   text: string,
-  signal: { cancelled: boolean; audio?: HTMLAudioElement }
+  signal: { cancelled: boolean; audio?: HTMLAudioElement },
+  setBeakOpen: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<void> {
   if (signal.cancelled) return
 
@@ -88,18 +89,25 @@ async function playOpenAITTS(
 
   signal.audio = audio
 
+  const mouthInterval = setInterval(() => {
+    setBeakOpen(prev => !prev)
+  }, 180)
+
   await new Promise<void>((resolve) => {
-    audio.onended = () => {
+    const finish = () => {
+      clearInterval(mouthInterval)
+
+      setBeakOpen(false)
+
       URL.revokeObjectURL(url)
+
       resolve()
     }
 
-    audio.onerror = () => {
-      URL.revokeObjectURL(url)
-      resolve()
-    }
+    audio.onended = finish
+    audio.onerror = finish
 
-    audio.play().catch(resolve)
+    audio.play().catch(finish)
   })
 }
 
@@ -133,14 +141,11 @@ export function useTTS(
 
         const spokenText = stripMarkdown(text)
 
-        setBeakOpen(true)
-
         await playOpenAITTS(
           spokenText,
-          signal
+          signal,
+          setBeakOpen
         )
-
-        setBeakOpen(false)
 
         if (signal.cancelled) return
 
