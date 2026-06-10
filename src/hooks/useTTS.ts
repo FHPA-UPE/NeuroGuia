@@ -1,10 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
 
-const FEMALE_VOICE_KEYWORDS = ['maria', 'luciana', 'vitória', 'vitoria', 'camila', 'fernanda', 'isabela']
-
-const AUDIO_INTRO = '/audio/tts-intro.mp3'
-const AUDIO_OUTRO = '/audio/tts-outro.mp3'
+import { useEffect, useState } from 'react'
 
 function stripMarkdown(text: string): string {
   return text
@@ -30,106 +26,136 @@ function stripMarkdown(text: string): string {
     .trim()
 }
 
-function pickFemaleVoice(): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis.getVoices()
-  const ptVoices = voices.filter(v => v.lang.startsWith('pt'))
-  const female = ptVoices.find(v =>
-    FEMALE_VOICE_KEYWORDS.some(kw => v.name.toLowerCase().includes(kw))
-  )
-  return female ?? ptVoices.find(v => v.lang === 'pt-BR') ?? ptVoices[0] ?? null
-}
-
-function playAudio(src: string, signal: { cancelled: boolean }): Promise<void> {
+function playAudio(
+  src: string,
+  signal: { cancelled: boolean; audio?: HTMLAudioElement }
+): Promise<void> {
   return new Promise((resolve) => {
-    if (signal.cancelled) { resolve(); return }
-    const audio = new Audio(src)
-    const done = () => resolve()
-    audio.onended = done
-    audio.onerror = done
-    audio.play().catch(done)
-    // store reference for external cancellation
-    ;(signal as typeof signal & { audio?: HTMLAudioElement }).audio = audio
-  })
-}
-
-export function useTTS(text: string | null, playKey?: unknown): { isSpeaking: boolean; beakOpen: boolean } {
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const [beakOpen,   setBeakOpen]   = useState(false)
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return
-
-    if (text === null) {
-      window.speechSynthesis.cancel()
+    if (signal.cancelled) {
+      resolve()
       return
     }
 
-    const signal: { cancelled: boolean; audio?: HTMLAudioElement } = { cancelled: false }
+    const audio = new Audio(src)
 
-    let fallbackId:    ReturnType<typeof setInterval>  | null = null
-    let fallbackCheck: ReturnType<typeof setTimeout>   | null = null
-    let beakCloseId:   ReturnType<typeof setTimeout>   | null = null
-    let fallbackBeak   = false
+    signal.audio = audio
 
-    const stopTimers = () => {
-      if (fallbackId)    { clearInterval(fallbackId);   fallbackId    = null }
-      if (fallbackCheck) { clearTimeout(fallbackCheck); fallbackCheck = null }
-      if (beakCloseId)   { clearTimeout(beakCloseId);   beakCloseId   = null }
+    const done = () => resolve()
+
+    audio.onended = done
+    audio.onerror = done
+
+    audio.play().catch(done)
+  })
+}
+
+async function playOpenAITTS(
+  text: string,
+  signal: { cancelled: boolean; audio?: HTMLAudioElement },
+  setBeakOpen: React.Dispatch<React.SetStateAction<boolean>>
+): Promise<void> {
+  if (signal.cancelled) return
+
+  const response = await fetch(
+    'http://localhost:8000/tts',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text
+      })
+    }
+  )
+
+  if (!response.ok) {
+    const errorText = await response.text()
+
+    console.error('Backend retornou:', errorText)
+
+    throw new Error(
+      `Erro ${response.status}: ${errorText}`
+    )
+  }
+
+  const blob = await response.blob()
+
+  if (signal.cancelled) return
+
+  const url = URL.createObjectURL(blob)
+
+  const audio = new Audio(url)
+
+  signal.audio = audio
+
+  const mouthInterval = setInterval(() => {
+    setBeakOpen(prev => !prev)
+  }, 180)
+
+  await new Promise<void>((resolve) => {
+    const finish = () => {
+      clearInterval(mouthInterval)
+
+      setBeakOpen(false)
+
+      URL.revokeObjectURL(url)
+
+      resolve()
+    }
+
+    audio.onended = finish
+    audio.onerror = finish
+
+    audio.play().catch(finish)
+  })
+}
+
+export function useTTS(
+  text: string | null,
+  playKey?: unknown
+): {
+  isSpeaking: boolean
+  beakOpen: boolean
+} {
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [beakOpen, setBeakOpen] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    if (text === null) return
+
+    const signal: {
+      cancelled: boolean
+      audio?: HTMLAudioElement
+    } = {
+      cancelled: false
     }
 
     const run = async () => {
-      setIsSpeaking(true)
+      try {
+        setIsSpeaking(true)
 
-      // Intro audio
-      await playAudio(AUDIO_INTRO, signal)
-      if (signal.cancelled) return
+        if (signal.cancelled) return
 
-      // TTS
-      const spokenText = stripMarkdown(text)
-      window.speechSynthesis.cancel()
-      const utterance  = new SpeechSynthesisUtterance(spokenText)
-      utterance.lang   = 'pt-BR'
-      utterance.rate   = 0.95
-      utterance.pitch  = 1.1
+        const spokenText = stripMarkdown(text)
 
-      const voice = pickFemaleVoice()
-      if (voice) utterance.voice = voice
+        await playOpenAITTS(
+          spokenText,
+          signal,
+          setBeakOpen
+        )
 
-      let boundaryFired = false
+        if (signal.cancelled) return
 
-      utterance.onstart = () => {
-        fallbackCheck = setTimeout(() => {
-          if (!boundaryFired) {
-            fallbackId = setInterval(() => {
-              fallbackBeak = !fallbackBeak
-              setBeakOpen(fallbackBeak)
-            }, 350)
-          }
-        }, 600)
-      }
+        if (!signal.cancelled) {
+          setIsSpeaking(false)
+        }
+      } catch (error) {
+        console.error('Erro TTS:', error)
 
-      utterance.onboundary = (event: SpeechSynthesisEvent) => {
-        if (event.name !== 'word') return
-        boundaryFired = true
-        if (fallbackId) { clearInterval(fallbackId); fallbackId = null }
-        if (beakCloseId) { clearTimeout(beakCloseId); beakCloseId = null }
-        setBeakOpen(true)
-        beakCloseId = setTimeout(() => setBeakOpen(false), 180)
-      }
-
-      await new Promise<void>((resolve) => {
-        const finish = () => { stopTimers(); setBeakOpen(false); resolve() }
-        utterance.onend   = finish
-        utterance.onerror = finish
-        window.speechSynthesis.speak(utterance)
-      })
-
-      if (signal.cancelled) return
-
-      // Outro audio
-      await playAudio(AUDIO_OUTRO, signal)
-
-      if (!signal.cancelled) {
+        setBeakOpen(false)
         setIsSpeaking(false)
       }
     }
@@ -138,13 +164,19 @@ export function useTTS(text: string | null, playKey?: unknown): { isSpeaking: bo
 
     return () => {
       signal.cancelled = true
-      signal.audio?.pause()
-      window.speechSynthesis.cancel()
-      stopTimers()
-      setIsSpeaking(false)
+
+      if (signal.audio) {
+        signal.audio.pause()
+        signal.audio.currentTime = 0
+      }
+
       setBeakOpen(false)
+      setIsSpeaking(false)
     }
   }, [text, playKey])
 
-  return { isSpeaking, beakOpen }
+  return {
+    isSpeaking,
+    beakOpen
+  }
 }
