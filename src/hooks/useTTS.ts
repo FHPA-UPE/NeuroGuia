@@ -26,88 +26,137 @@ function stripMarkdown(text: string): string {
     .trim()
 }
 
-function playAudio(
-  src: string,
-  signal: { cancelled: boolean; audio?: HTMLAudioElement }
+type TTSSignal = {
+  cancelled: boolean
+  audio?: HTMLAudioElement
+  intervalId?: ReturnType<typeof setInterval>
+}
+
+async function pipeChunksToSourceBuffer(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  sourceBuffer: SourceBuffer,
+  mediaSource: MediaSource,
+  signal: TTSSignal
 ): Promise<void> {
-  return new Promise((resolve) => {
-    if (signal.cancelled) {
-      resolve()
-      return
-    }
+  // Wait for updateend OR reject on sourceBuffer error (prevents deadlock)
+  const waitForUpdate = () =>
+    new Promise<void>((resolve, reject) => {
+      const onEnd = () => { cleanup(); resolve() }
+      const onErr = () => { cleanup(); reject(new Error('SourceBuffer error')) }
+      function cleanup() {
+        sourceBuffer.removeEventListener('updateend', onEnd)
+        sourceBuffer.removeEventListener('error', onErr)
+      }
+      sourceBuffer.addEventListener('updateend', onEnd, { once: true })
+      sourceBuffer.addEventListener('error', onErr, { once: true })
+    })
 
-    const audio = new Audio(src)
+  while (true) {
+    if (signal.cancelled) break
 
-    signal.audio = audio
+    const { done, value } = await reader.read()
+    if (signal.cancelled || done) break
 
-    const done = () => resolve()
+    if (sourceBuffer.updating) await waitForUpdate()
+    if (signal.cancelled) break
 
-    audio.onended = done
-    audio.onerror = done
+    sourceBuffer.appendBuffer(value)
+    await waitForUpdate()
+  }
 
-    audio.play().catch(done)
-  })
+  try { mediaSource.endOfStream() } catch { /* já encerrado */ }
 }
 
 async function playOpenAITTS(
   text: string,
-  signal: { cancelled: boolean; audio?: HTMLAudioElement },
+  signal: TTSSignal,
   setBeakOpen: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<void> {
   if (signal.cancelled) return
 
-  const response = await fetch(
-    'http://localhost:8000/tts',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        text
-      })
-    }
-  )
+  const response = await fetch('http://localhost:8000/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  })
 
   if (!response.ok) {
     const errorText = await response.text()
-
     console.error('Backend retornou:', errorText)
-
-    throw new Error(
-      `Erro ${response.status}: ${errorText}`
-    )
+    throw new Error(`Erro ${response.status}: ${errorText}`)
   }
-
-  const blob = await response.blob()
 
   if (signal.cancelled) return
 
-  const url = URL.createObjectURL(blob)
+  // Interval stored in signal so cleanup() can always clear it as a safety net
+  const mouthInterval = setInterval(() => setBeakOpen(prev => !prev), 180)
+  signal.intervalId = mouthInterval
 
+  const canStream =
+    typeof MediaSource !== 'undefined' &&
+    MediaSource.isTypeSupported('audio/mpeg') &&
+    !!response.body
+
+  if (!canStream) {
+    const blob = await response.blob()
+    if (signal.cancelled) { clearInterval(mouthInterval); return }
+
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    signal.audio = audio
+
+    await new Promise<void>((resolve) => {
+      const finish = () => {
+        clearInterval(mouthInterval)
+        setBeakOpen(false)
+        URL.revokeObjectURL(url)
+        resolve()
+      }
+      audio.onended = finish
+      audio.onerror = finish
+      audio.play().catch(finish)
+    })
+    return
+  }
+
+  // Streaming path: plays as chunks arrive via MediaSource
+  const mediaSource = new MediaSource()
+  const url = URL.createObjectURL(mediaSource)
   const audio = new Audio(url)
-
   signal.audio = audio
-
-  const mouthInterval = setInterval(() => {
-    setBeakOpen(prev => !prev)
-  }, 180)
+  const reader = response.body!.getReader()
 
   await new Promise<void>((resolve) => {
     const finish = () => {
       clearInterval(mouthInterval)
-
       setBeakOpen(false)
-
       URL.revokeObjectURL(url)
-
       resolve()
     }
 
     audio.onended = finish
     audio.onerror = finish
+    mediaSource.addEventListener('error', () => finish())
 
-    audio.play().catch(finish)
+    mediaSource.addEventListener('sourceopen', () => {
+      let sourceBuffer: SourceBuffer
+      try {
+        sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg')
+      } catch {
+        finish()
+        return
+      }
+
+      sourceBuffer.addEventListener('error', () => finish())
+
+      audio.play().catch(finish)
+
+      pipeChunksToSourceBuffer(reader, sourceBuffer, mediaSource, signal).catch((err) => {
+        console.error('Erro no streaming TTS:', err)
+        try { mediaSource.endOfStream('decode') } catch { /* já encerrado */ }
+        finish()
+      })
+    })
   })
 }
 
@@ -123,38 +172,23 @@ export function useTTS(
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-
     if (text === null) return
 
-    const signal: {
-      cancelled: boolean
-      audio?: HTMLAudioElement
-    } = {
-      cancelled: false
-    }
+    const signal: TTSSignal = { cancelled: false }
 
     const run = async () => {
       try {
         setIsSpeaking(true)
-
         if (signal.cancelled) return
 
         const spokenText = stripMarkdown(text)
-
-        await playOpenAITTS(
-          spokenText,
-          signal,
-          setBeakOpen
-        )
-
-        if (signal.cancelled) return
+        await playOpenAITTS(spokenText, signal, setBeakOpen)
 
         if (!signal.cancelled) {
           setIsSpeaking(false)
         }
       } catch (error) {
         console.error('Erro TTS:', error)
-
         setBeakOpen(false)
         setIsSpeaking(false)
       }
@@ -164,19 +198,16 @@ export function useTTS(
 
     return () => {
       signal.cancelled = true
-
+      // Safety net: always clear interval even if finish() was never called
+      if (signal.intervalId) clearInterval(signal.intervalId)
       if (signal.audio) {
         signal.audio.pause()
         signal.audio.currentTime = 0
       }
-
       setBeakOpen(false)
       setIsSpeaking(false)
     }
   }, [text, playKey])
 
-  return {
-    isSpeaking,
-    beakOpen
-  }
+  return { isSpeaking, beakOpen }
 }

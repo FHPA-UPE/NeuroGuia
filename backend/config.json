@@ -3,7 +3,7 @@
   "llm_provider": "google",
   "llm_model": "gemini-2.5-flash",
   "llm_temperature": 0.3,
-  "llm_max_tokens": 2048,
+  "llm_max_tokens": 4096,
   "embed_provider": "google",
   "embed_model": "models/gemini-embedding-001",
   "rag_retrieval_k": 6,

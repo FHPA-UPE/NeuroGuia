@@ -1,9 +1,9 @@
-from io import BytesIO
 import edge_tts
+from typing import AsyncGenerator
 
 VOICE = "pt-BR-AntonioNeural"
 
-async def generate_speech(text: str):
+async def generate_speech(text: str) -> AsyncGenerator[bytes, None]:
     communicate = edge_tts.Communicate(
         text=text,
         voice=VOICE,
@@ -11,10 +11,9 @@ async def generate_speech(text: str):
         pitch="-2Hz"
     )
 
-    audio_bytes = b""
+    async def _stream():
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                yield chunk["data"]
 
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            audio_bytes += chunk["data"]
-
-    return BytesIO(audio_bytes)
+    return _stream()

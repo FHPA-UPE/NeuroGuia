@@ -1,6 +1,8 @@
 import asyncio
 import hashlib
 import mimetypes
+import re
+import time
 from pathlib import Path
 from typing import AsyncGenerator
 
@@ -66,6 +68,47 @@ def load_and_chunk(path: Path, source_id: str) -> list[Document]:
     return chunks
 
 
+async def _add_documents_with_rate_limit(
+    vectorstore, chunks: list[Document], progress_queue: asyncio.Queue, filename: str
+) -> None:
+    BATCH_SIZE = 5
+    INTER_BATCH_DELAY = 4.0
+    MAX_RETRIES = 6
+
+    total = len(chunks)
+    added = 0
+
+    for i in range(0, total, BATCH_SIZE):
+        batch = chunks[i : i + BATCH_SIZE]
+        retries = 0
+
+        while True:
+            try:
+                await asyncio.to_thread(vectorstore.add_documents, batch)
+                added += len(batch)
+                await progress_queue.put(
+                    {"status": "embedding_progress", "file": filename, "added": added, "total": total}
+                )
+                break
+            except Exception as e:
+                err = str(e)
+                if "429" in err or "RESOURCE_EXHAUSTED" in err:
+                    if retries >= MAX_RETRIES:
+                        raise RuntimeError(f"Rate limit: máximo de tentativas atingido para {filename}") from e
+                    match = re.search(r"retry in (\d+(?:\.\d+)?)s", err, re.IGNORECASE)
+                    wait = float(match.group(1)) if match else min(60.0, 10.0 * (2 ** retries))
+                    await progress_queue.put(
+                        {"status": "rate_limited", "file": filename, "wait_seconds": round(wait), "retry": retries + 1}
+                    )
+                    await asyncio.sleep(wait)
+                    retries += 1
+                else:
+                    raise
+
+        if i + BATCH_SIZE < total:
+            await asyncio.sleep(INTER_BATCH_DELAY)
+
+
 async def ingest_file(path: Path, embeddings, progress_queue: asyncio.Queue) -> dict:
     source_id = compute_sha256(path)
     collection = get_chroma_collection()
@@ -87,7 +130,7 @@ async def ingest_file(path: Path, embeddings, progress_queue: asyncio.Queue) -> 
         collection_name=COLLECTION_NAME,
         embedding_function=embeddings,
     )
-    vectorstore.add_documents(chunks)
+    await _add_documents_with_rate_limit(vectorstore, chunks, progress_queue, path.name)
     path.unlink(missing_ok=True)
 
     await progress_queue.put({"status": "done", "file": path.name, "chunks": len(chunks)})
