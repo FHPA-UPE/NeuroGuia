@@ -9,6 +9,7 @@ from sse_starlette.sse import EventSourceResponse
 import auth as auth_module
 from services import ingest_service
 from providers import get_embeddings
+from paths import DOCS_PATH
 
 router = APIRouter(prefix="/docs", tags=["docs"])
 security = HTTPBearer(auto_error=False)
@@ -52,16 +53,14 @@ async def upload(file: UploadFile = File(...), user: dict = Depends(_require_rol
     if len(content) > ingest_service.MAX_BYTES:
         raise HTTPException(status_code=422, detail="Arquivo maior que 20 MB")
     suffix = SUFFIX_MAP[file.content_type]
-    docs_dir = Path(__file__).parent.parent / "docs"
-    dest = docs_dir / (Path(file.filename).stem + suffix)
+    dest = DOCS_PATH / (Path(file.filename).stem + suffix)
     dest.write_bytes(content)
     return {"filename": dest.name, "size": len(content)}
 
 
 @router.post("/ingest")
 async def ingest(user: dict = Depends(_require_role("admin_ppgec", "admin"))):
-    docs_dir = Path(__file__).parent.parent / "docs"
-    files = [f for f in docs_dir.iterdir() if f.suffix in (".pdf", ".txt", ".docx") and f.name != ".gitkeep"]
+    files = [f for f in DOCS_PATH.iterdir() if f.suffix in (".pdf", ".txt", ".docx") and f.name != ".gitkeep"]
     if not files:
         raise HTTPException(status_code=404, detail="Nenhum arquivo encontrado em docs/")
 
