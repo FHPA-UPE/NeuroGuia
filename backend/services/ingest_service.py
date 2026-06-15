@@ -11,9 +11,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader, TextLoader
 from langchain_core.documents import Document
 
+from paths import CHROMA_PATH, DOCS_PATH
 from services.config_service import read_config
-
-CHROMA_PATH = Path(__file__).parent.parent / "chroma_db"
 COLLECTION_NAME = "neuroguia"
 ALLOWED_MIME = {
     "application/pdf",
@@ -146,7 +145,7 @@ def delete_by_source_id(source_id: str) -> int:
     filename = (results["metadatas"][0] or {}).get("source", "") if results["metadatas"] else ""
     collection.delete(ids=ids)
     if filename:
-        physical = Path(__file__).parent.parent / "docs" / filename
+        physical = DOCS_PATH / filename
         physical.unlink(missing_ok=True)
     return len(ids)
 
