@@ -46,6 +46,7 @@ next-env.d.ts
 
 # local docs
 docs/
+!docs/superpowers/
 
 # vector database (user-generated embeddings)
 backend/chroma_db/
