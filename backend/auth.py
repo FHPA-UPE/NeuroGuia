@@ -7,7 +7,7 @@ from typing import Optional
 import bcrypt
 from jose import JWTError, jwt
 
-USERS_PATH = Path(__file__).parent / "users.json"
+from paths import USERS_PATH
 SECRET_KEY = os.getenv("JWT_SECRET", "neuroguia-dev-secret-change-in-prod")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MINUTES = 1440  # 24 horas
