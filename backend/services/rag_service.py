@@ -1,9 +1,7 @@
-import math
 from typing import Any
 
 import chromadb
 from langchain_classic.retrievers import EnsembleRetriever
-from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain_community.retrievers import BM25Retriever
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
@@ -12,7 +10,6 @@ from paths import CHROMA_PATH
 from services.config_service import read_config
 
 COLLECTION_NAME = "neuroguia"
-RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
 
 def _get_collection_count() -> int:
@@ -51,24 +48,13 @@ def _build_ensemble(embeddings: Any, n_candidates: int) -> EnsembleRetriever:
 def retrieve(query: str, embeddings: Any) -> list[Document]:
     cfg = read_config()
     k = cfg.get("rag_retrieval_k", 6)
-    score_threshold = cfg.get("rag_score_threshold", 0.0)
 
     if _get_collection_count() == 0:
         return []
 
     ensemble = _build_ensemble(embeddings, k * 2)
     candidates = ensemble.invoke(query)
-
-    cross_encoder = HuggingFaceCrossEncoder(model_name=RERANKER_MODEL)
-    raw_scores = cross_encoder.score([(query, doc.page_content) for doc in candidates])
-    norm_scores = [1.0 / (1.0 + math.exp(-float(s))) for s in raw_scores]
-
-    ranked = sorted(zip(candidates, norm_scores), key=lambda x: x[1], reverse=True)
-
-    if score_threshold > 0.0:
-        ranked = [(d, s) for d, s in ranked if s >= score_threshold]
-
-    return [doc for doc, _ in ranked[:k]]
+    return candidates[:k]
 
 
 def extract_sources(docs: list[Document]) -> list[str]:
