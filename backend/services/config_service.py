@@ -1,9 +1,8 @@
 import json
 import os
-from pathlib import Path
 from filelock import FileLock
 
-CONFIG_PATH = Path(__file__).parent.parent / "config.json"
+from paths import CONFIG_PATH
 _LOCK_PATH = CONFIG_PATH.with_suffix(".lock")
 
 _cache: dict = {}
