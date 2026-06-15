@@ -60,7 +60,7 @@ async function pipeChunksToSourceBuffer(
     if (sourceBuffer.updating) await waitForUpdate()
     if (signal.cancelled) break
 
-    sourceBuffer.appendBuffer(value)
+    sourceBuffer.appendBuffer(new Uint8Array(value))
     await waitForUpdate()
   }
 
