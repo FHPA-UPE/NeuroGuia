@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+
 function stripMarkdown(text: string): string {
   return text
     .replace(/!\[.*?\]\(.*?\)/g, '')
@@ -74,7 +76,7 @@ async function playOpenAITTS(
 ): Promise<void> {
   if (signal.cancelled) return
 
-  const response = await fetch('http://localhost:8000/tts', {
+  const response = await fetch(`${API}/tts`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text })
