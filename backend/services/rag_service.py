@@ -1,5 +1,4 @@
 import math
-from pathlib import Path
 from typing import Any
 
 import chromadb
@@ -9,9 +8,9 @@ from langchain_community.retrievers import BM25Retriever
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
+from paths import CHROMA_PATH
 from services.config_service import read_config
 
-CHROMA_PATH = Path(__file__).parent.parent / "chroma_db"
 COLLECTION_NAME = "neuroguia"
 RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
