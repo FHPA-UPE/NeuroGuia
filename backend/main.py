@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,13 +12,16 @@ from routers import docs as docs_router
 from routers import feedback as feedback_router
 from routers.tts import router as tts_router
 
-_ALLOWED_ORIGINS = ["http://localhost:3000"]
+_ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
 load_dotenv()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    from paths import DOCS_PATH, CHROMA_PATH
+    DOCS_PATH.mkdir(parents=True, exist_ok=True)
+    CHROMA_PATH.mkdir(parents=True, exist_ok=True)
     yield
 
 
@@ -25,7 +29,7 @@ app = FastAPI(title="NeuroGuia API", lifespan=lifespan, docs_url="/api-docs", re
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,7 +57,8 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 async def health():
     try:
         import chromadb
-        client = chromadb.PersistentClient(path="chroma_db")
+        from paths import CHROMA_PATH
+        client = chromadb.PersistentClient(path=str(CHROMA_PATH))
         client.list_collections()
         chromadb_status = "ok"
     except Exception as e:
