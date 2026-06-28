@@ -12,3 +12,4 @@ class ChatResponse(BaseModel):
     avatar_state: Literal["neutral", "happy", "encouraging", "empathetic", "thoughtful"]
     movement: Literal["idle", "talking", "thinking"]
     quick_replies: Optional[list[str]] = None
+    contexts: Optional[list[str]] = None

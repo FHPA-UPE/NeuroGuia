@@ -29,8 +29,13 @@ class RagService:
         return len(chunks)
 
     def buscar(self, query: str, k: int = 4) -> str:
+        context, _ = self.buscar_com_chunks(query, k)
+        return context
+
+    def buscar_com_chunks(self, query: str, k: int = 4) -> tuple[str, list[str]]:
         retriever = self.vectorstore.as_retriever(search_kwargs={"k": k})
         docs = retriever.invoke(query)
         if not docs:
-            return ""
-        return "\n\n".join(doc.page_content for doc in docs)
+            return "", []
+        chunks = [doc.page_content for doc in docs]
+        return "\n\n".join(chunks), chunks

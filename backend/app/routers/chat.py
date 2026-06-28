@@ -15,12 +15,13 @@ rag_service = RagService(
 
 
 async def stream_resposta(request: ChatRequest):
-    context = rag_service.buscar(request.message)
+    context, chunks = rag_service.buscar_com_chunks(request.message)
     response = llm_service.responder(
         message=request.message,
         context=context,
         history=request.history,
     )
+    response.contexts = chunks
     data = json.dumps(response.model_dump())
     yield f"data: {data}\n\n"
 
